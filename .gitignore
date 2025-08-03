@@ -4,6 +4,9 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+**/Roles.java
+**/UserRepo.java
+**/Users.java
 ### STS ###
 .apt_generated
 .classpath
