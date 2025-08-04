@@ -59,12 +59,10 @@ public class WebSecurityConfig {
                         .requestMatchers(
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
-                                "/webjars/**",
                                 "/v3/api-docs/**",
-                                "/v3/api-docs",
+                                "/v3/api-docs.yaml",
                                 "/swagger-resources/**",
-                                "/swagger-ui/index.html",
-                                "/swagger-ui/index.html#/**"
+                                "/webjars/**"
                         ).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

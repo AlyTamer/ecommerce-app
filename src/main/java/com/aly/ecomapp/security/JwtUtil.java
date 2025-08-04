@@ -1,5 +1,5 @@
 package com.aly.ecomapp.security;
-import com.aly.ecomapp.UserRepo;
+import com.aly.ecomapp.deletelater.UserRepo;
 import com.aly.ecomapp.exceptions.JwtException;
 import com.aly.ecomapp.exceptions.JwtExceptionMessages;
 import io.jsonwebtoken.Jwts;
@@ -7,7 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
-import org.apache.catalina.User;
+import com.aly.ecomapp.deletelater.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -32,17 +32,17 @@ public class JwtUtil {
     }
 
     public String generateToken(String username) {
-        User user = userRepo.findByUserName(username);
+        User user = userRepo.findByUsername(username);
         return Jwts.builder()
                 .setSubject(username)
-                .claim("role", user.getRoles().toString())
+                .claim("role", user.getRole().toString())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + expirationTime))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-   public String getUserNameToken(String token){
+   public String getUsernameToken(String token){
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()

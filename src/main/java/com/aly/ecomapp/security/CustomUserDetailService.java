@@ -1,9 +1,9 @@
 package com.aly.ecomapp.security;
 
-import com.aly.ecomapp.UserRepo;
+import com.aly.ecomapp.deletelater.UserRepo;
 import com.aly.ecomapp.exceptions.UserException;
 import com.aly.ecomapp.exceptions.UserExceptionMessages;
-import org.apache.catalina.User;
+import com.aly.ecomapp.deletelater.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,7 +25,7 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User appUser = userRepo.findByUserName(username);
+        User appUser = userRepo.findByUsername(username);
         if (appUser == null) {
             throw new UserException(UserExceptionMessages.userNotFound);
         }
@@ -34,7 +34,7 @@ public class CustomUserDetailService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(
                 appUser.getUsername(),
                 appUser.getPassword(),
-                List.of(new SimpleGrantedAuthority(appUser.getRoles().toString())));
+                List.of(new SimpleGrantedAuthority(appUser.getRole().toString())));
     }
 }
 

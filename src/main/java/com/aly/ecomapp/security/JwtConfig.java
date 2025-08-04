@@ -29,6 +29,14 @@ public class JwtConfig extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) {
         try {
+            String path = request.getRequestURI();
+            if(path.startsWith("/swagger-ui") ||
+                    path.startsWith("/v3/api-docs") ||
+                    path.startsWith("/swagger-resources") ||
+                    path.startsWith("/webjars")){
+                filterChain.doFilter(request, response);
+                return;
+            }
             String authHeader = request.getHeader("Authorization");
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
                 throw new JwtException(JwtExceptionMessages.invalidHeader);
@@ -36,7 +44,7 @@ public class JwtConfig extends OncePerRequestFilter {
             String token = authHeader.substring(7);
             JwtUtil jwtUtil = new JwtUtil();
             jwtUtil.validateToken(token);
-            String username = jwtUtil.getUserNameToken(token);
+            String username = jwtUtil.getUsernameToken(token);
 
             if (username != null
                     && SecurityContextHolder.getContext().getAuthentication() == null) {
