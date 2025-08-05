@@ -1,13 +1,15 @@
-package com.aly.ecomapp.deletelater;
+package com.aly.ecomapp.testing;
 
 import jakarta.persistence.*;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.management.relation.Role;
 
 @Entity
 @Table(name= "users")
-public class User {
+@Getter
+@Setter
+public class TestUser {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
@@ -15,7 +17,8 @@ public class User {
     nullable = false)
     private String username;
     private String password;
-    private Role role;
+    @Enumerated(EnumType.STRING)
+    private TestRoles role;
     @Column(unique = true)
     private String email;
 }

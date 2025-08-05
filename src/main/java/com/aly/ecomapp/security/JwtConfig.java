@@ -67,10 +67,9 @@
 
                 } else {
                     filterChain.doFilter(request, response);
-                    return;
                 }
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                throw new JwtException(JwtExceptionMessages.tokenParsingFailure);
             }
 
 
