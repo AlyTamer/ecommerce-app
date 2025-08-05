@@ -1,7 +1,7 @@
 package com.aly.ecomapp.security;
 
-import com.aly.ecomapp.exceptions.UserException;
-import com.aly.ecomapp.exceptions.UserExceptionMessages;
+import com.aly.ecomapp.exception.UserException;
+import com.aly.ecomapp.exception.UserExceptionMessages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,12 +39,12 @@ public class WebSecurityConfig {
             try {
                 userDetails = userDetailsService.loadUserByUsername(authentication.getPrincipal().toString());
             } catch (Exception e) {
-                throw new UserException(UserExceptionMessages.invalidCredentials);
+                throw new UserException(UserExceptionMessages.INVALID_CREDENTIALS);
             }
-            if (userDetails == null) throw new UserException(UserExceptionMessages.userNotFound);
+            if (userDetails == null) throw new UserException(UserExceptionMessages.USER_NOT_FOUND);
             if (!passwordEncoder.matches(authentication.getCredentials().toString(),
                     userDetails.getPassword())) {
-                throw new UserException(UserExceptionMessages.invalidCredentials);
+                throw new UserException(UserExceptionMessages.INVALID_CREDENTIALS);
             }
             return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         };

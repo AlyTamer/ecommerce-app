@@ -1,8 +1,8 @@
 package com.aly.ecomapp.security;
 
 import com.aly.ecomapp.testing.TestUserRepo;
-import com.aly.ecomapp.exceptions.UserException;
-import com.aly.ecomapp.exceptions.UserExceptionMessages;
+import com.aly.ecomapp.exception.UserException;
+import com.aly.ecomapp.exception.UserExceptionMessages;
 import com.aly.ecomapp.testing.TestUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,7 +27,7 @@ public class CustomUserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         TestUser appTestUser = testUserRepo.findByUsername(username);
         if (appTestUser == null) {
-            throw new UserException(UserExceptionMessages.userNotFound);
+            throw new UserException(UserExceptionMessages.USER_NOT_FOUND);
         }
 
 

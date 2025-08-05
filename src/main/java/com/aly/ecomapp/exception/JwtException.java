@@ -1,4 +1,4 @@
-package com.aly.ecomapp.exceptions;
+package com.aly.ecomapp.exception;
 
 public class JwtException extends RuntimeException {
     public JwtException(String message) {

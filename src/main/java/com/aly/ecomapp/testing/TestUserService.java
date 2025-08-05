@@ -1,7 +1,7 @@
 package com.aly.ecomapp.testing;
 
-import com.aly.ecomapp.exceptions.UserException;
-import com.aly.ecomapp.exceptions.UserExceptionMessages;
+import com.aly.ecomapp.exception.UserException;
+import com.aly.ecomapp.exception.UserExceptionMessages;
 import com.aly.ecomapp.security.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,10 +43,10 @@ public class TestUserService {
 
     public void changePassword(String newPassword,String oldPassword, Long id) {
         TestUser testUser = testUserRepo.findUserById(id);
-        if(testUser ==null) throw new UserException(UserExceptionMessages.userNotFound);
+        if(testUser ==null) throw new UserException(UserExceptionMessages.USER_NOT_FOUND);
         String encodedNewPassword = passwordEncoder.encode(newPassword);
         if(!passwordEncoder.matches(oldPassword, testUser.getPassword())) {
-            throw new UserException(UserExceptionMessages.invalidCredentials);
+            throw new UserException(UserExceptionMessages.INVALID_CREDENTIALS);
         }
         testUser.setPassword(encodedNewPassword);
         testUserRepo.save(testUser);

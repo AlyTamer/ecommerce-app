@@ -1,7 +1,7 @@
     package com.aly.ecomapp.security;
 
-    import com.aly.ecomapp.exceptions.JwtException;
-    import com.aly.ecomapp.exceptions.JwtExceptionMessages;
+    import com.aly.ecomapp.exception.JwtException;
+    import com.aly.ecomapp.exception.JwtExceptionMessages;
     import io.jsonwebtoken.Claims;
     import jakarta.servlet.FilterChain;
     import jakarta.servlet.http.HttpServletRequest;
@@ -69,7 +69,7 @@
                     filterChain.doFilter(request, response);
                 }
             } catch (Exception e) {
-                throw new JwtException(JwtExceptionMessages.tokenParsingFailure);
+                throw new JwtException(JwtExceptionMessages.TOKEN_PARSING_ERROR);
             }
 
 

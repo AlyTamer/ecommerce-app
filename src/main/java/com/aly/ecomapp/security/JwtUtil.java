@@ -1,9 +1,9 @@
 package com.aly.ecomapp.security;
 import com.aly.ecomapp.testing.TestUserRepo;
-import com.aly.ecomapp.exceptions.JwtException;
-import com.aly.ecomapp.exceptions.JwtExceptionMessages;
-import com.aly.ecomapp.exceptions.UserException;
-import com.aly.ecomapp.exceptions.UserExceptionMessages;
+import com.aly.ecomapp.exception.JwtException;
+import com.aly.ecomapp.exception.JwtExceptionMessages;
+import com.aly.ecomapp.exception.UserException;
+import com.aly.ecomapp.exception.UserExceptionMessages;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -37,7 +37,7 @@ public class JwtUtil {
     public String generateToken(String username) {
         TestUser testUser = testUserRepo.findByUsername(username);
         if(testUser == null) {
-            throw new UserException(UserExceptionMessages.userNotFound);
+            throw new UserException(UserExceptionMessages.USER_NOT_FOUND);
         }
         return Jwts.builder()
                 .setSubject(username)
@@ -54,7 +54,7 @@ public class JwtUtil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        if(claims==null) throw new JwtException(JwtExceptionMessages.invalidToken);
+        if(claims==null) throw new JwtException(JwtExceptionMessages.INVALID_JWT_TOKEN);
         return claims.getSubject();
    }
 
@@ -63,7 +63,7 @@ public class JwtUtil {
             Jwts.parserBuilder().setSigningKey(key).build()
                     .parseClaimsJws(token);
         }catch (Exception e){
-            throw new JwtException(JwtExceptionMessages.invalidToken);
+            throw new JwtException(JwtExceptionMessages.INVALID_JWT_TOKEN);
         }
         if (Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -74,7 +74,7 @@ public class JwtUtil {
                 .after(new Date()))
             return ;
         else {
-            throw new JwtException(JwtExceptionMessages.expiredToken);
+            throw new JwtException(JwtExceptionMessages.EXPIRED);
         }
     }
 
