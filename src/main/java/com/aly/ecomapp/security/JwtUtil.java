@@ -2,6 +2,9 @@ package com.aly.ecomapp.security;
 import com.aly.ecomapp.deletelater.UserRepo;
 import com.aly.ecomapp.exceptions.JwtException;
 import com.aly.ecomapp.exceptions.JwtExceptionMessages;
+import com.aly.ecomapp.exceptions.UserException;
+import com.aly.ecomapp.exceptions.UserExceptionMessages;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -33,6 +36,9 @@ public class JwtUtil {
 
     public String generateToken(String username) {
         User user = userRepo.findByUsername(username);
+        if(user == null) {
+            throw new UserException(UserExceptionMessages.userNotFound);
+        }
         return Jwts.builder()
                 .setSubject(username)
                 .claim("role", user.getRole().toString())
@@ -43,12 +49,13 @@ public class JwtUtil {
     }
 
    public String getUsernameToken(String token){
-        return Jwts.parserBuilder()
+        Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
-                .parseClaimsJwt(token)
-                .getBody()
-                .getSubject();
+                .parseClaimsJws(token)
+                .getBody();
+        if(claims==null) throw new JwtException(JwtExceptionMessages.invalidToken);
+        return claims.getSubject();
    }
 
     public boolean validateToken(String token) {
