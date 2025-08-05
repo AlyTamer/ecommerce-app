@@ -16,10 +16,10 @@ public class CartService {
 
     @Autowired
     private CartRepository cartRepository;
-    private static final int MAX_ITEMS = 10; // cart limit
+    private static final int MAX_ITEMS = 10; // cart limit 10
 
     // calculate total price
-    private BigDecimal calculateTotal(List<CartItem> items) {
+    BigDecimal calculateTotal(List<CartItem> items) {
         if (items == null) return BigDecimal.ZERO;
         return items.stream()
                 .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))

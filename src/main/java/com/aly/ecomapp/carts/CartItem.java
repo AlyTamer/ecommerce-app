@@ -20,7 +20,7 @@ public class CartItem {
     private int quantity;
 
     @Column(name = "price", nullable = false)
-    private BigDecimal price; // save price at time of adding
+    private BigDecimal price;
 
 
 
