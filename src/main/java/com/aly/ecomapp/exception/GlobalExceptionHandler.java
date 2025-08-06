@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.Instant;
-
+//Event handler to handle all exceptions for the program
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -18,6 +18,7 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
+    //any exception not specified will be handled here and send a bad request response
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGenericException(Exception ex, WebRequest request) {
         return ResponseEntity
