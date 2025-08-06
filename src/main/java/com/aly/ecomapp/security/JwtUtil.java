@@ -14,6 +14,8 @@ import com.aly.ecomapp.testing.TestUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.Key;
 import java.util.Date;
@@ -28,6 +30,7 @@ public class JwtUtil {
     private Key key;
     @Autowired
     private TestUserRepo testUserRepo;
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
     @PostConstruct
     public void init() {
@@ -37,6 +40,7 @@ public class JwtUtil {
     public String generateToken(String username) {
         TestUser testUser = testUserRepo.findByUsername(username);
         if(testUser == null) {
+            logger.error("JWT generation failed: {}", username);
             throw new UserException(UserExceptionMessages.USER_NOT_FOUND);
         }
         return Jwts.builder()
@@ -63,6 +67,7 @@ public class JwtUtil {
             Jwts.parserBuilder().setSigningKey(key).build()
                     .parseClaimsJws(token);
         }catch (Exception e){
+            logger.error("Invalid JWT token: {}", e.getMessage());
             throw new JwtException(JwtExceptionMessages.INVALID_JWT_TOKEN);
         }
         if (Jwts.parserBuilder()
@@ -74,6 +79,7 @@ public class JwtUtil {
                 .after(new Date()))
             return ;
         else {
+            logger.error("Expired JWT token: {}", token);
             throw new JwtException(JwtExceptionMessages.EXPIRED);
         }
     }
