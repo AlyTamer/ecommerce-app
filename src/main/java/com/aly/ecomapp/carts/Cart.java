@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "cart_items")
+@Table(name = "cart")
 @Getter
 @Setter
 public class Cart {
