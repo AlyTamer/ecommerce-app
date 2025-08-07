@@ -3,9 +3,9 @@ services:
     image: postgres:17
     container_name: ecomapp-db
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: ecomdb
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_DB=ecomdb
     ports:
       - "5400:5432"
     volumes:
@@ -21,15 +21,13 @@ services:
     ports:
       - "8000:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ecomdb
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: 123
-      SPRING_JPA_HIBERNATE_DDL_AUTO: create-drop
-      SPRING_JPA_SHOW_SQL: "true"
-      JWT_SECRET: JgK1xNmNq2pPzqKnESw91A+pkBb1knk4FzXbUeLzmUM=
-      JWT_EXPIRATION: 315360000000
-    volumes:
-      - ./logs:/app/logs
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/ecomdb
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=123
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=create-drop
+      - SPRING_JPA_SHOW_SQL=true
+      - JWT_SECRET=JgK1xNmNq2pPzqKnESw91A+pkBb1knk4FzXbUeLzmUM=
+      - JWT_EXPIRATION=315360000000
 
 volumes:
   postgres_data:

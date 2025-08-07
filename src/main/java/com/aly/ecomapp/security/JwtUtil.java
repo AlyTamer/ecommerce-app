@@ -28,8 +28,8 @@ public class JwtUtil {
     private Long expirationTime;
     @Getter
     private Key key;
-    @Autowired
-    private TestUserRepo testUserRepo;
+    // TODO Uncomment the following line when UserRepo is available
+//    @Autowired private TestUserRepo testUserRepo;
     private static final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
 
     @PostConstruct
@@ -38,14 +38,15 @@ public class JwtUtil {
     }
 
     public String generateToken(String username) {
-        TestUser testUser = testUserRepo.findByUsername(username);
-        if(testUser == null) {
-            logger.error("JWT generation failed: {}", username);
-            throw new UserException(UserExceptionMessages.USER_NOT_FOUND);
-        }
+//todo uncomment the following line when UserRepo is available
+        //        User testUser = userRepo.findByUsername(username);
+//        if(testUser == null) {
+//            logger.error("JWT generation failed: {}", username);
+//            throw new UserException(UserExceptionMessages.USER_NOT_FOUND);
+//        }
         return Jwts.builder()
                 .setSubject(username)
-                .claim("role", testUser.getRole().toString())
+                .claim("role","ROLE_USER")
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(new Date().getTime() + expirationTime))
                 .signWith(key, SignatureAlgorithm.HS256)
