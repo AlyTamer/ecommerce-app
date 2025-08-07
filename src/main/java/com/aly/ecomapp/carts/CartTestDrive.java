@@ -81,11 +81,18 @@ public class CartTestDrive {
         verify(cartRepository, never()).save(any(Cart.class));
     }
 
-    // test to make sure that item limit is 10
+    // test to make sure that item limit is less than 10
     @Test
     void shouldUpdateCart_Success() {
 
+        Cart cart = new Cart();
+        cart.setId(1L);
+        cart.setUserId(101L);
+        cart.setItems(new ArrayList<>());
+
         when(cartRepository.findById(1L)).thenReturn(Optional.of(cart));
+
+        when(cartRepository.save(any(Cart.class))).thenAnswer(i -> i.getArgument(0));
 
         List<CartItemDTO> newItemDTOs = List.of(
                 new CartItemDTO(null, 601L, 1, new BigDecimal("10.00"))
@@ -96,12 +103,12 @@ public class CartTestDrive {
         assertNotNull(result);
         assertEquals(1, result.getItems().size());
         assertEquals(new BigDecimal("10.00"), result.getTotal());
+        verify(cartRepository).save(any(Cart.class));
     }
 
     //if items >10 >>>>no more items can be added
     @Test
     void shouldNotUpdateCart_WhenMoreThan10Items() {
-
         List<CartItemDTO> over10Items = new ArrayList<>();
         for (int i = 0; i < 11; i++) {
             over10Items.add(new CartItemDTO(null, (long) (500 + i), 1, new BigDecimal("10.00")));
@@ -110,7 +117,11 @@ public class CartTestDrive {
         RuntimeException thrown = assertThrows(RuntimeException.class, () -> {
             cartService.updateCart(1L, over10Items);
         });
+
         assertEquals("Cannot add more than 10 items to the cart.", thrown.getMessage());
+
+        // Optional: Verify findById was NOT called
+        verify(cartRepository, never()).findById(anyLong());
     }
 
     // test to check calculations (gettotal methode)
