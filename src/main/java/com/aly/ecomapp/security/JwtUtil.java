@@ -1,5 +1,4 @@
 package com.aly.ecomapp.security;
-import com.aly.ecomapp.testing.TestUserRepo;
 import com.aly.ecomapp.exception.JwtException;
 import com.aly.ecomapp.exception.JwtExceptionMessages;
 import com.aly.ecomapp.exception.UserException;
@@ -10,7 +9,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
-import com.aly.ecomapp.testing.TestUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
