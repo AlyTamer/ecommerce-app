@@ -57,7 +57,7 @@
             String token = auth.substring(7);
             try {
                 jwtUtil.validateToken(token);
-                String username = jwtUtil.getUsernameToken(token);
+                String username = jwtUtil.getUsernameFromToken(token);
 
                 Claims claims = Jwts.parserBuilder()
                         .setSigningKey(jwtUtil.getKey())
