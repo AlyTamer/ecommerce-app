@@ -1,5 +1,6 @@
-package com.aly.ecomapp.carts;
+package com.aly.ecomapp;
 
+import com.aly.ecomapp.carts.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
