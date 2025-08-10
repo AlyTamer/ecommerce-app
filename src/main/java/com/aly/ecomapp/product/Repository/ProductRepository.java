@@ -1,7 +1,10 @@
-package com.aly.ecomapp.products;
-
+package com.aly.ecomapp.product.Repository;
+import com.aly.ecomapp.product.entity.ProductStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
+import com.aly.ecomapp.product.entity.Category; // Updated import
+import com.aly.ecomapp.product.entity.ProductEntity; // Updated import
+import com.aly.ecomapp.product.entity.ProductStatus;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 

@@ -1,9 +1,10 @@
-package com.aly.ecomapp.products;
-
+package com.aly.ecomapp.product.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import com.aly.ecomapp.product.DTO.CategoryDTO;
+import com.aly.ecomapp.product.entity.Category;
+import com.aly.ecomapp.product.Repository.CategoryRepository;
+import com.aly.ecomapp.product.Repository.ProductRepository;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,8 +1,10 @@
-package com.aly.ecomapp.products;
-
+package com.aly.ecomapp.product.Service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.aly.ecomapp.product.DTO.CategoryDTO;
+import com.aly.ecomapp.product.entity.Category;
+import com.aly.ecomapp.product.Repository.CategoryRepository;
+import com.aly.ecomapp.product.Repository.ProductRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 

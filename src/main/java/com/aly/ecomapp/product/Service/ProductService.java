@@ -1,5 +1,10 @@
-package com.aly.ecomapp.products;
-
+package com.aly.ecomapp.product.Service;
+import com.aly.ecomapp.product.DTO.ProductDTO;
+import com.aly.ecomapp.product.entity.Category;
+import com.aly.ecomapp.product.entity.ProductEntity;
+import com.aly.ecomapp.product.entity.ProductStatus;
+import com.aly.ecomapp.product.Repository.CategoryRepository;
+import com.aly.ecomapp.product.Repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,20 +23,20 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<ProductDto> getAllProducts() {
+    public List<ProductDTO> getAllProducts() {
         return productRepository.findAll().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    public ProductDto getProductById(Long id) {
+    public ProductDTO getProductById(Long id) {
         ProductEntity product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         return convertToDto(product);
     }
 
     @Transactional
-    public ProductDto createProduct(ProductDto productDto) {
+    public ProductDTO createProduct(ProductDTO productDto) {
         Category category = categoryRepository.findById(productDto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
@@ -49,7 +54,7 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductDto updateProduct(Long id, ProductDto productDto) {
+    public ProductDTO updateProduct(Long id, ProductDTO productDto) {
         ProductEntity existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
@@ -75,7 +80,7 @@ public class ProductService {
         productRepository.save(product);
     }
 
-    public List<ProductDto> getProductsByCategory(Long categoryId) {
+    public List<ProductDTO> getProductsByCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
@@ -84,22 +89,22 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    public List<ProductDto> searchProducts(String query) {
+    public List<ProductDTO> searchProducts(String query) {
         return productRepository.findByNameContainingIgnoreCase(query).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public ProductDto updateProductStatus(Long id, ProductStatus status) {
+    public ProductDTO updateProductStatus(Long id, ProductStatus status) {
         ProductEntity product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         product.setStatus(status);
         return convertToDto(productRepository.save(product));
     }
 
-    private ProductDto convertToDto(ProductEntity product) {
-        ProductDto dto = new ProductDto();
+    private ProductDTO convertToDto(ProductEntity product) {
+        ProductDTO dto = new ProductDTO();
         dto.setId(product.getId());
         dto.setName(product.getName());
         dto.setPrice(product.getPrice());

@@ -1,14 +1,12 @@
-package com.aly.ecomapp.products;
+package com.aly.ecomapp.product.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Table(name = "categories")
-@Getter
-@Setter
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,6 +16,4 @@ public class Category {
     private String name;
 
     private String description;
-
-
 }

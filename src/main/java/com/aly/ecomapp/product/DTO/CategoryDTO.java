@@ -1,4 +1,4 @@
-package com.aly.ecomapp.products;
+package com.aly.ecomapp.product.DTO;
 import lombok.Data;
 
 @Data

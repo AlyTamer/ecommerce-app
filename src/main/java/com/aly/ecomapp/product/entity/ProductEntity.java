@@ -1,4 +1,5 @@
-package com.aly.ecomapp.products;
+package com.aly.ecomapp.product.entity;
+import com.aly.ecomapp.product.entity.ProductStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,7 +21,7 @@ public class ProductEntity {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
-}
-enum ProductStatus {
-    ACTIVE, INACTIVE, OUT_OF_STOCK, DISCONTINUED
+    @Enumerated(EnumType.STRING)
+    private ProductStatus status;
+
 }
