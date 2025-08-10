@@ -63,7 +63,8 @@ public class WebSecurityConfig {
                                 "/v3/api-docs",
                                 "/v3/api-docs.yaml",
                                 "/swagger-resources/**",
-                                "/webjars/**")
+                                "/webjars/**"
+                                )
                         .permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

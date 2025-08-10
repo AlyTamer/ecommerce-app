@@ -1,9 +1,6 @@
 package com.aly.ecomapp.security;
-
-import com.aly.ecomapp.testing.TestUserRepo;
 import com.aly.ecomapp.exception.UserException;
 import com.aly.ecomapp.exception.UserExceptionMessages;
-import com.aly.ecomapp.testing.TestUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,26 +13,33 @@ import java.util.List;
 
 @Service
 public class CustomUserDetailService implements UserDetailsService {
+    // UserRepo to be added here
+    //private final UserRepo userRepo;
 
-    private final TestUserRepo testUserRepo;
-
-    @Autowired
-    public CustomUserDetailService(TestUserRepo testUserRepo) {
-        this.testUserRepo = testUserRepo;
-    }
+    //Constructor to be added here once userrepo is created
+//    @Autowired
+//    public CustomUserDetailService(
+//            TestUserRepo testUserRepo) {
+//        this.testUserRepo = testUserRepo;
+//    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        TestUser appTestUser = testUserRepo.findByUsername(username);
-        if (appTestUser == null) {
+//        User appUser = testUserRepo.findByUsername(username);
+        //Change name from static to appUser/User iteslef once userepo and user entity are cretaed
+        //TODO IMPLEMENT USER FETCHING LOGIC
+        String userName = "testUser"; // Replace with actual logic to fetch user from database
+        if (userName == null) {
             throw new UserException(UserExceptionMessages.USER_NOT_FOUND);
         }
 
-
+        //TODO IMPLEMENT PASSWORD USERNAME AND ROLE FETCHING
         return new org.springframework.security.core.userdetails.User(
-                appTestUser.getUsername(),
-                appTestUser.getPassword(),
-                List.of(new SimpleGrantedAuthority(appTestUser.getRole().toString())));
+                userName,
+                "password", // Replace with actual password logic
+                List.of(new SimpleGrantedAuthority(
+                        "ROLE_USER" // Replace with actual roles logic
+                )));
     }
 }
 
