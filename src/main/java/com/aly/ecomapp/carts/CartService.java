@@ -26,15 +26,6 @@ public class CartService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    // link Cart to CartDTO
-    /*private CartDTO toDTO(Cart cart) {
-        List<CartItemDTO> itemDTOs = cart.getItems().stream()
-                .map(item -> new CartItemDTO(item.getId(), item.getProductId(), item.getQuantity(), item.getPrice()))
-                .collect(Collectors.toList());
-
-        BigDecimal total = calculateTotal(cart.getItems());
-        return new CartDTO(cart.getId(), cart.getUserId(), itemDTOs, total);
-    }*/
 
     private CartDTO toDTO(Cart cart) {
         if (cart == null) {
