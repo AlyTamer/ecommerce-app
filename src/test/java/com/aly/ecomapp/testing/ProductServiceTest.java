@@ -94,16 +94,25 @@ class ProductServiceTest {
 
     @Test
     void updateProductStatus_UpdatesCorrectly() {
-        ProductEntity product = new ProductEntity(1L, "Item", 100.0, 5, 4.0, electronics, ProductStatus.ACTIVE);
-
+        ProductEntity product = ProductEntity.builder()
+                .id(1L)
+                .name("Item")
+                .price(100.0)
+                .quantity(5)
+                .rating(4.0)
+                .category(electronics)
+                .status(ProductStatus.ACTIVE)
+                .build();
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-        when(productRepository.save(any(ProductEntity.class))).thenReturn(product);
+        when(productRepository.save(any(ProductEntity.class))).thenAnswer(invocation -> {
+            ProductEntity p = invocation.getArgument(0);
+            return p;
+        });
 
         ProductDTO result = productService.updateProductStatus(1L, ProductStatus.DISCONTINUED);
 
         assertEquals(ProductStatus.DISCONTINUED, result.getStatus());
     }
-
     @Test
     void searchProducts_ReturnsMatching() {
         ProductEntity product = new ProductEntity(1L, "Tablet", 300.0, 5, 4.0, electronics, ProductStatus.ACTIVE);

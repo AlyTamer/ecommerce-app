@@ -7,6 +7,7 @@ import lombok.*;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Table(name = "products")
 public class ProductEntity {
     @Id
