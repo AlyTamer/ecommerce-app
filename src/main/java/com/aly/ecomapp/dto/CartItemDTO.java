@@ -1,4 +1,4 @@
-package com.aly.ecomapp.carts;
+package com.aly.ecomapp.dto;
 
 
 import lombok.Getter;

@@ -1,11 +1,20 @@
-package com.aly.ecomapp.carts;
+package com.aly.ecomapp.service;
 
 
+import com.aly.ecomapp.dto.CartDTO;
+import com.aly.ecomapp.dto.CartItemDTO;
+import com.aly.ecomapp.entity.Cart;
+import com.aly.ecomapp.entity.CartItem;
+import com.aly.ecomapp.exception.CartException;
+import com.aly.ecomapp.exception.CartExceptionMessages;
+import com.aly.ecomapp.repository.CartRepository;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +38,7 @@ public class CartService {
 
     private CartDTO toDTO(Cart cart) {
         if (cart == null) {
-            throw new IllegalArgumentException("Cart cannot be null");
+            throw new CartException(CartExceptionMessages.CART_NOT_FOUND);
         }
         List<CartItemDTO> itemDTOs = cart.getItems().stream()
                 .map(item -> new CartItemDTO(
@@ -91,19 +100,33 @@ public class CartService {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found with ID: " + cartId));
 
-        List<CartItem> items = itemDTOs.stream().map(dto -> {
-            CartItem item = new CartItem();
-            item.setId(dto.getId());
-            item.setProductId(dto.getProductId());
-            item.setQuantity(dto.getQuantity());
-            item.setPrice(dto.getPrice());
-            return item;
-        }).collect(Collectors.toList());
+        List<CartItem> items=new ArrayList<>();
+        for (CartItemDTO dto : itemDTOs) {
+            CartItem cartItem = new CartItem();
+//            cartItem.setId(dto.getId());
+            cartItem.setProductId(dto.getProductId());
+            cartItem.setQuantity(dto.getQuantity());
+            cartItem.setPrice(dto.getPrice());
+            items.add(cartItem);
+        }
 
-        cart.setItems(items);
+//        List<CartItem> items = itemDTOs.stream().map(dto -> {
+//            CartItem item = new CartItem();
+//            item.setId(dto.getId());
+//            item.setProductId(dto.getProductId());
+//            item.setQuantity(dto.getQuantity());
+//            item.setPrice(dto.getPrice());
+//            return item;
+//        }).collect(Collectors.toList());
+
+//        cart.setItems(items);
+//        cart.setItems(items);
+        cart.getItems().clear();
+        cart.getItems().addAll(items);
         Cart updated = cartRepository.save(cart);
         return toDTO(updated);
     }
+
     //for checkout
     public CartDTO initiateCheckout(Long cartId) {
         Cart cart = cartRepository.findById(cartId)
@@ -132,6 +155,4 @@ public class CartService {
         cartRepository.deleteById(cartId);
     }
 }
-
-
 
