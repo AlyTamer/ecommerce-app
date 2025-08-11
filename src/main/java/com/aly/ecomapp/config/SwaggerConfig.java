@@ -32,3 +32,5 @@ import io.swagger.v3.oas.annotations.servers.Server;
 )
 public class SwaggerConfig {
 }
+
+

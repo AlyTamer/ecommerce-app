@@ -1,4 +1,4 @@
-package com.aly.ecomapp.security;
+/*package com.aly.ecomapp.security;
 import com.aly.ecomapp.exception.JwtException;
 import com.aly.ecomapp.exception.JwtExceptionMessages;
 import com.aly.ecomapp.exception.UserException;
@@ -84,4 +84,63 @@ public class JwtUtil {
     }
 
 
+}*/
+package com.aly.ecomapp.security;
+
+import com.aly.ecomapp.exception.JwtException;
+import com.aly.ecomapp.exception.JwtExceptionMessages;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
+import java.util.Date;
+
+@Component
+public class JwtUtil {
+    @Value("${jwt.secret}") private String secret;
+    @Value("${jwt.expiration}") private Long expirationTime; // ms
+    @Getter private Key key;
+
+    private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
+
+    @PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public String generateToken(String email, String roleWithPrefix) {
+        return Jwts.builder()
+                .setSubject(email)                          // email as subject
+                .claim("role", roleWithPrefix)               // e.g. ROLE_ADMIN
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String getEmailFromToken(String token) {
+        var claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        if (claims == null) throw new JwtException(JwtExceptionMessages.INVALID_JWT_TOKEN);
+        return claims.getSubject();
+    }
+
+    public void validateToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+        } catch (Exception e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
+            throw new JwtException(JwtExceptionMessages.INVALID_JWT_TOKEN);
+        }
+    }
 }
+
+
+
+
