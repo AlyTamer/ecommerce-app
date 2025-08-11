@@ -1,4 +1,4 @@
-package com.aly.ecomapp.security;
+/*package com.aly.ecomapp.security;
 import com.aly.ecomapp.exception.UserException;
 import com.aly.ecomapp.exception.UserExceptionMessages;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,5 +41,40 @@ public class CustomUserDetailService implements UserDetailsService {
                         "ROLE_USER" // Replace with actual roles logic
                 )));
     }
+}*/
+
+package com.aly.ecomapp.security;
+
+import com.aly.ecomapp.exception.UserException;
+import com.aly.ecomapp.exception.UserExceptionMessages;
+import com.aly.ecomapp.repository.AppUserRepository;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.*;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class CustomUserDetailService implements UserDetailsService {
+
+    private final AppUserRepository repo;
+
+    public CustomUserDetailService(AppUserRepository repo) {
+        this.repo = repo;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        var user = repo.findByEmail(email.toLowerCase())
+                .orElseThrow(() -> new UserException(UserExceptionMessages.USER_NOT_FOUND));
+
+        var authority = new SimpleGrantedAuthority("ROLE_" + user.getRole().name()); // ROLE_USER / ROLE_ADMIN
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPasswordHash(),
+                List.of(authority)
+        );
+    }
 }
+
 
