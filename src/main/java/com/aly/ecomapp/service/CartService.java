@@ -1,13 +1,11 @@
 package com.aly.ecomapp.service;
 
 
+import com.aly.ecomapp.repository.CartRepository;
 import com.aly.ecomapp.dto.CartDTO;
 import com.aly.ecomapp.dto.CartItemDTO;
 import com.aly.ecomapp.entity.Cart;
 import com.aly.ecomapp.entity.CartItem;
-import com.aly.ecomapp.exception.CartException;
-import com.aly.ecomapp.exception.CartExceptionMessages;
-import com.aly.ecomapp.repository.CartRepository;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -155,4 +153,6 @@ public class CartService {
         cartRepository.deleteById(cartId);
     }
 }
+
+
 
