@@ -1,6 +1,11 @@
 package com.aly.ecomapp;
 
-import com.aly.ecomapp.carts.*;
+import com.aly.ecomapp.dto.CartDTO;
+import com.aly.ecomapp.dto.CartItemDTO;
+import com.aly.ecomapp.entity.Cart;
+import com.aly.ecomapp.entity.CartItem;
+import com.aly.ecomapp.repository.CartRepository;
+import com.aly.ecomapp.service.CartService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
