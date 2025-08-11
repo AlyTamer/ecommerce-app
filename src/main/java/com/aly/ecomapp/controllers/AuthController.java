@@ -1,10 +1,10 @@
 package com.aly.ecomapp.controllers;
 
-import com.aly.ecomapp.Entity.Role;
 import com.aly.ecomapp.dto.AuthResponse;
 import com.aly.ecomapp.dto.LoginRequest;
 import com.aly.ecomapp.dto.RegisterRequest;
 import com.aly.ecomapp.dto.UserResponse;
+import com.aly.ecomapp.entity.Role;
 import com.aly.ecomapp.service.AuthService;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;

@@ -1,8 +1,8 @@
 package com.aly.ecomapp.service;
 
-import com.aly.ecomapp.Entity.AppUser;
-import com.aly.ecomapp.Entity.UserStatus;
 import com.aly.ecomapp.dto.UserResponse;
+import com.aly.ecomapp.entity.AppUser;
+import com.aly.ecomapp.entity.UserStatus;
 import com.aly.ecomapp.repository.AppUserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

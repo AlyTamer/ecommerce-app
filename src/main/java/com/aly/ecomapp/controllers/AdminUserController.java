@@ -1,9 +1,11 @@
 package com.aly.ecomapp.controllers;
 
-import com.aly.ecomapp.Entity.Role;
+
 import com.aly.ecomapp.dto.AdminCreateUserRequest;
+import com.aly.ecomapp.dto.RegisterRequest;
 import com.aly.ecomapp.dto.UpdateStatusRequest;
 import com.aly.ecomapp.dto.UserResponse;
+import com.aly.ecomapp.entity.Role;
 import com.aly.ecomapp.service.AuthService;
 import com.aly.ecomapp.service.UserService;
 import jakarta.annotation.security.RolesAllowed;
@@ -48,7 +50,7 @@ public class AdminUserController {
             catch (IllegalArgumentException e) { throw new IllegalArgumentException("role must be ADMIN or USER"); }
         }
         var created = authService.register(
-                new com.aly.ecomapp.dto.RegisterRequest(req.email(), req.password()),
+                new RegisterRequest(req.email(), req.password()),
                 role
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(created);

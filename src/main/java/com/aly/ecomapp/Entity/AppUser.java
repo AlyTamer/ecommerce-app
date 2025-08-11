@@ -1,5 +1,4 @@
-package com.aly.ecomapp.Entity;
-
+package com.aly.ecomapp.entity;
 
 import jakarta.persistence.*;
 import java.time.Instant;

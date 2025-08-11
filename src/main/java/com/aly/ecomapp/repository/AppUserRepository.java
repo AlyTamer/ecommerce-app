@@ -1,6 +1,6 @@
 package com.aly.ecomapp.repository;
 
-import com.aly.ecomapp.Entity.AppUser;
+import com.aly.ecomapp.entity.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
