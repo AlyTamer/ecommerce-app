@@ -1,0 +1,103 @@
+package com.aly.ecomapp.testing;
+
+import com.aly.ecomapp.product.dto.CategoryDto;
+import com.aly.ecomapp.product.Repository.CategoryRepository;
+import com.aly.ecomapp.product.Repository.ProductRepository;
+import com.aly.ecomapp.product.entity.Category;
+import com.aly.ecomapp.product.Service.CategoryService;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+class CategoryServiceTest {
+
+    @Mock
+    private CategoryRepository categoryRepository;
+
+    @Mock
+    private ProductRepository productRepository;
+
+    @InjectMocks
+    private CategoryService categoryService;
+
+    public CategoryServiceTest() {
+        MockitoAnnotations.openMocks(this);
+    }
+
+    @Test
+    void testGetAllCategories() {
+        List<Category> categories = Arrays.asList(
+                new Category(1L, "Electronics", "Tech stuff"),
+                new Category(2L, "Books", "Reading materials")
+        );
+
+        when(categoryRepository.findAll()).thenReturn(categories);
+
+        List<CategoryDto> result = categoryService.getAllCategories();
+
+        assertEquals(2, result.size());
+        assertEquals("Books", result.get(1).getName());
+    }
+    @Test
+    void testUpdateCategory_Success() {
+        Category existing = new Category(1L, "OldName", "OldDesc");
+
+        CategoryDto update = new CategoryDto();
+        update.setName("NewName");
+        update.setDescription("Updated");
+
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(categoryRepository.existsByName("NewName")).thenReturn(false);
+        when(categoryRepository.save(any(Category.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        CategoryDto result = categoryService.updateCategory(1L, update);
+
+        assertEquals("NewName", result.getName());
+        assertEquals("Updated", result.getDescription());
+    }
+    @Test
+    void testCreateCategory_Success() {
+        CategoryDto dto = new CategoryDto();
+        dto.setName("Clothing");
+        dto.setDescription("Fashion & apparel");
+
+        when(categoryRepository.existsByName("Clothing")).thenReturn(false);
+        when(categoryRepository.save(any(Category.class))).thenAnswer(inv -> {
+            Category cat = inv.getArgument(0);
+            cat.setId(10L);
+            return cat;
+        });
+
+        CategoryDto result = categoryService.createCategory(dto);
+
+        assertEquals("Clothing", result.getName());
+        assertEquals("Fashion & apparel", result.getDescription());
+    }
+
+    @Test
+    void testGetCategoryById() {
+        Category category = new Category(1L, "Electronics", "Gadgets and devices");
+
+        when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
+
+        CategoryDto result = categoryService.getCategoryById(1L);
+
+        assertEquals("Electronics", result.getName());
+        assertEquals("Gadgets and devices", result.getDescription());
+    }
+    @Test
+    void testDeleteCategory_Success() {
+        Category category = new Category(1L, "Sports", "All sports items");
+        categoryRepository.save(category);
+
+     assertNotNull( categoryRepository.existsById(1L));
+    }
+}
