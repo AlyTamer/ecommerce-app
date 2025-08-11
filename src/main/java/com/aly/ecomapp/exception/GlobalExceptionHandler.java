@@ -18,7 +18,12 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
-    //any exception not specified will be handled here and send a bad request response
+    @ExceptionHandler(CartException.class)
+    public ResponseEntity<String> handleCartException(CartException ex, WebRequest request) {
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGenericException(Exception ex, WebRequest request) {
         return ResponseEntity

@@ -13,9 +13,8 @@ import io.swagger.v3.oas.annotations.servers.Server;
                 description = "API documentation for Bright Skies Task to test out the Ecommerce Application"
         ),
 
-        servers ={ @Server(
-                        url = "http://localhost:8080",
-                        description = "Local server"),
+        servers ={
+                @Server(url = "http://localhost:8080"),
         @Server(
                 url = "http://localhost:8000",
                 description = "docker local server"
