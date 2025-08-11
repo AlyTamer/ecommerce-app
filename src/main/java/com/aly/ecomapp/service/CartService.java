@@ -143,7 +143,8 @@ public class CartService {
     public void clearCart(Long cartId) {
         Cart cart = cartRepository.findById(cartId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
-        cart.setItems(List.of());
+
+        cart.getItems().clear();
         cartRepository.save(cart);
     }
 
