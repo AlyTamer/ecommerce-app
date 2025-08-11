@@ -17,6 +17,6 @@ VALUES (
            'admin@example.com',
            '$2a$10$69u3D/FXOY0loIcG4UI6LO9n5bk9LcxKBRA.WNlfPxG9QIS0tU1XW', -- bcrypt of: admin123
            'ADMIN',
-           'NONE',
+           'AVAILABLE',
            NOW()
        );
