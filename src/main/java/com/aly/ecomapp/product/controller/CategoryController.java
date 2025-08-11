@@ -1,5 +1,5 @@
 package com.aly.ecomapp.product.controller;
-import com.aly.ecomapp.product.DTO.CategoryDTO;
+import com.aly.ecomapp.product.dto.CategoryDto;
 import com.aly.ecomapp.product.Service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/categories")
+@RequestMapping("/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -17,26 +17,26 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping
-    public ResponseEntity<List<CategoryDTO>> getAllCategories() {
+    @GetMapping("/category")
+    public ResponseEntity<List<CategoryDto>> getAllCategories() {
         return ResponseEntity.ok(categoryService.getAllCategories());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryDTO> getCategoryById(@PathVariable Long id) {
+    public ResponseEntity<CategoryDto> getCategoryById(@PathVariable Long id) {
         return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
 
-    @PostMapping
-    public ResponseEntity<CategoryDTO> createCategory(@RequestBody CategoryDTO categoryDTO) {
-        CategoryDTO createdCategory = categoryService.createCategory(categoryDTO);
+    @PostMapping("/createCategory")
+    public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto categoryDTO) {
+        CategoryDto createdCategory = categoryService.createCategory(categoryDTO);
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryDTO> updateCategory(
+    public ResponseEntity<CategoryDto> updateCategory(
             @PathVariable Long id,
-            @RequestBody CategoryDTO categoryDTO) {
+            @RequestBody CategoryDto categoryDTO) {
         return ResponseEntity.ok(categoryService.updateCategory(id, categoryDTO));
     }
 

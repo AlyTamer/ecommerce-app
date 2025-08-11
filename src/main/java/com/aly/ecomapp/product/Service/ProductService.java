@@ -1,12 +1,14 @@
 package com.aly.ecomapp.product.Service;
-import com.aly.ecomapp.product.DTO.ProductDTO;
+import com.aly.ecomapp.product.dto.ProductDto;
 import com.aly.ecomapp.product.entity.Category;
-import com.aly.ecomapp.product.entity.ProductEntity;
+import com.aly.ecomapp.product.entity.Product;
 import com.aly.ecomapp.product.entity.ProductStatus;
 import com.aly.ecomapp.product.Repository.CategoryRepository;
 import com.aly.ecomapp.product.Repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.aly.ecomapp.product.exception.ProductException;
+import com.aly.ecomapp.product.exception.ProductExceptionMessages;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,24 +25,23 @@ public class ProductService {
         this.categoryRepository = categoryRepository;
     }
 
-    public List<ProductDTO> getAllProducts() {
+    public List<ProductDto> getAllProducts() {
         return productRepository.findAll().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    public ProductDTO getProductById(Long id) {
-        ProductEntity product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+    public ProductDto getProductById(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductException(ProductExceptionMessages.PRODUCT_NOT_FOUND));
         return convertToDto(product);
     }
 
     @Transactional
-    public ProductDTO createProduct(ProductDTO productDto) {
-        Category category = categoryRepository.findById(productDto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+    public ProductDto createProduct(ProductDto productDto) {
+        Category category = categoryRepository.findById(productDto.getCategoryId()).orElseThrow(() -> new RuntimeException("Category not found"));
 
-        ProductEntity product = new ProductEntity();
+        Product product = new Product();
         product.setName(productDto.getName());
         product.setPrice(productDto.getPrice());
         product.setQuantity(productDto.getQuantity());
@@ -49,17 +50,17 @@ public class ProductService {
                 productDto.getStatus() : ProductStatus.ACTIVE);
         product.setCategory(category);
 
-        ProductEntity savedProduct = productRepository.save(product);
+        Product savedProduct = productRepository.save(product);
         return convertToDto(savedProduct);
     }
 
     @Transactional
-    public ProductDTO updateProduct(Long id, ProductDTO productDto) {
-        ProductEntity existingProduct = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+    public ProductDto updateProduct(Long id, ProductDto productDto) {
+        Product existingProduct = productRepository.findById(id)
+                .orElseThrow(() -> new ProductException(ProductExceptionMessages.PRODUCT_NOT_FOUND));
 
         Category category = categoryRepository.findById(productDto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ProductException(ProductExceptionMessages.CATEGORY_NOT_FOUND));
 
         existingProduct.setName(productDto.getName());
         existingProduct.setPrice(productDto.getPrice());
@@ -68,43 +69,43 @@ public class ProductService {
         existingProduct.setStatus(productDto.getStatus());
         existingProduct.setCategory(category);
 
-        ProductEntity updatedProduct = productRepository.save(existingProduct);
+        Product updatedProduct = productRepository.save(existingProduct);
         return convertToDto(updatedProduct);
     }
 
     @Transactional
     public void deleteProduct(Long id) {
-        ProductEntity product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductException(ProductExceptionMessages.PRODUCT_NOT_FOUND));
         product.setStatus(ProductStatus.INACTIVE);
         productRepository.save(product);
     }
 
-    public List<ProductDTO> getProductsByCategory(Long categoryId) {
+    public List<ProductDto> getProductsByCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new ProductException(ProductExceptionMessages.CATEGORY_NOT_FOUND));
 
         return productRepository.findByCategory(category).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
-    public List<ProductDTO> searchProducts(String query) {
+    public List<ProductDto> searchProducts(String query) {
         return productRepository.findByNameContainingIgnoreCase(query).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public ProductDTO updateProductStatus(Long id, ProductStatus status) {
-        ProductEntity product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+    public ProductDto updateProductStatus(Long id, ProductStatus status) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductException(ProductExceptionMessages.PRODUCT_NOT_FOUND));
         product.setStatus(status);
         return convertToDto(productRepository.save(product));
     }
 
-    private ProductDTO convertToDto(ProductEntity product) {
-        ProductDTO dto = new ProductDTO();
+    private ProductDto convertToDto(Product product) {
+        ProductDto dto = new ProductDto();
         dto.setId(product.getId());
         dto.setName(product.getName());
         dto.setPrice(product.getPrice());

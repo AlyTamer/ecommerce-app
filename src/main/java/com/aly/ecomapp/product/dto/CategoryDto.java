@@ -1,8 +1,8 @@
-package com.aly.ecomapp.product.DTO;
+package com.aly.ecomapp.product.dto;
 import lombok.Data;
 
 @Data
-public class CategoryDTO {
+public class CategoryDto {
     private Long id;
     private String name;
     private String description;

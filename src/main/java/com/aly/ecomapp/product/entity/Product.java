@@ -1,5 +1,4 @@
 package com.aly.ecomapp.product.entity;
-import com.aly.ecomapp.product.entity.ProductStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Table(name = "products")
-public class ProductEntity {
+public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

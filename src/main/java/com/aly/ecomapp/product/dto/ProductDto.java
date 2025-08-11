@@ -1,9 +1,9 @@
-package com.aly.ecomapp.product.DTO;
+package com.aly.ecomapp.product.dto;
 import com.aly.ecomapp.product.entity.ProductStatus;
 import lombok.Data;
 
 @Data
-public class ProductDTO {
+public class ProductDto {
     private Long id;
     private String name;
     private Double price;
