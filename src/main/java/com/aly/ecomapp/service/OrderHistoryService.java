@@ -2,6 +2,8 @@ package com.aly.ecomapp.service;
 
 import com.aly.ecomapp.dto.OrderHistoryDTO;
 import com.aly.ecomapp.entity.OrderHistory;
+import com.aly.ecomapp.exception.OrderHistoryException;
+import com.aly.ecomapp.exception.OrderHistoryExceptionMessages;
 import com.aly.ecomapp.repository.OrderHistoryRepository;
 import com.aly.ecomapp.repository.OrderRepository;
 import org.springframework.stereotype.Service;
@@ -21,7 +23,12 @@ public class OrderHistoryService {
 
     public OrderHistoryDTO create(OrderHistoryDTO dto) {
         OrderHistory history = mapToEntity(dto);
-        OrderHistory saved = orderHistoryRepository.save(history);
+        OrderHistory saved = null;
+        try {
+            saved = orderHistoryRepository.save(history);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return mapToDTO(saved);
     }
 
@@ -39,7 +46,11 @@ public class OrderHistoryService {
     }
 
     public void delete(Long id) {
-        orderHistoryRepository.deleteById(id);
+        try {
+            orderHistoryRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new OrderHistoryException(OrderHistoryExceptionMessages.FAILED_TO_DELETE);
+        }
     }
 
     private OrderHistoryDTO mapToDTO(OrderHistory history) {
@@ -56,7 +67,7 @@ public class OrderHistoryService {
     private OrderHistory mapToEntity(OrderHistoryDTO dto) {
         OrderHistory history = new OrderHistory();
         history.setId(dto.getId());
-        history.setOrder(orderHistoryRepository.findById(dto.getOrderId()).orElse(null).getOrder());
+        history.setOrder(orderRepository.findById(dto.getOrderId()).orElseThrow(()-> new OrderHistoryException(OrderHistoryExceptionMessages.FAILED_TO_CREATE_ORDER_HISTROY)));
         history.setStatus(dto.getStatus());
         history.setTotalPrice(dto.getTotalPrice());
         history.setChangedAt(dto.getChangedAt());

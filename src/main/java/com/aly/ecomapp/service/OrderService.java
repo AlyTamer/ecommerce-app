@@ -21,6 +21,7 @@ public class OrderService {
     public OrderDTO create(OrderDTO orderDTO) {
         Order order = mapToEntity(orderDTO);
         Order savedOrder = orderRepository.save(order);
+
         return mapToDTO(savedOrder);
     }
 
@@ -59,7 +60,6 @@ public class OrderService {
     // Map DTO → entity
     private Order mapToEntity(OrderDTO dto) {
         Order order = new Order();
-        order.setId(dto.getId());
         order.setUserId(dto.getUserId());
         order.setStatus(dto.getStatus());
         order.setTotalPrice(dto.getTotalPrice());
