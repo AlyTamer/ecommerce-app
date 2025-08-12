@@ -1,4 +1,4 @@
-package com.aly.ecomapp.controllers;
+package com.aly.ecomapp.dto;
 import com.aly.ecomapp.entity.ProductStatus;
 import lombok.Data;
 

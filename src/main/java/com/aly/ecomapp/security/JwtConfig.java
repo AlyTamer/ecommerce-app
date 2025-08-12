@@ -145,13 +145,15 @@
                        .parseClaimsJws(token)
                        .getBody();
 
-               String role = claims.get("role", String.class); // e.g. ROLE_ADMIN or ROLE_USER
-               var authorities = List.of(new SimpleGrantedAuthority(role));
-
-               var user = userDetailsService.loadUserByUsername(email);
-               var authToken = new UsernamePasswordAuthenticationToken(user, null, authorities);
+               var user = userDetailsService.loadUserByUsername(email); // loads from DB
+               var authToken = new UsernamePasswordAuthenticationToken(
+                       user,
+                       null,
+                       user.getAuthorities() // <- directly from DB
+               );
                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                SecurityContextHolder.getContext().setAuthentication(authToken);
+
 
            } catch (JwtException e) {
                log.error("JWT validation failed: {}", e.getMessage());

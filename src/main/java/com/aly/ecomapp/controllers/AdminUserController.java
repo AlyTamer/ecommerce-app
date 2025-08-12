@@ -8,17 +8,18 @@ import com.aly.ecomapp.dto.UserResponse;
 import com.aly.ecomapp.entity.Role;
 import com.aly.ecomapp.service.AuthService;
 import com.aly.ecomapp.service.UserService;
-import jakarta.annotation.security.RolesAllowed;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin/users")
-@RolesAllowed("ADMIN")
-
+@PreAuthorize("hasRole('ADMIN')")
 public class AdminUserController {
 
     private final AuthService authService;
@@ -29,19 +30,32 @@ public class AdminUserController {
         this.userService = userService;
     }
 
-
+    @Operation(
+        summary = "List all users",
+        description = "Returns a list of all registered users in the system.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
     @GetMapping
     public List<UserResponse> list() {
         return userService.listAll();
     }
 
-
+    @Operation(
+        summary = "Get user by ID",
+        description = "Returns details of a user by their ID.",
+        security = @SecurityRequirement(name="bearerAuth")
+    )
     @GetMapping("/{id}")
     public UserResponse get(@PathVariable Long id) {
         return userService.get(id);
     }
 
-    /** CREATE user (or admin if role="ADMIN") */
+    @Operation(
+        summary = "Create a new user",
+        description = "Creates a new user with the specified email, password, and role (optional). " +
+                      "If no role is specified, the default is USER.",
+        security = @SecurityRequirement(name="bearerAuth")
+    )
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody AdminCreateUserRequest req) {
         Role role = Role.USER;
@@ -56,14 +70,24 @@ public class AdminUserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
-    /** UPDATE status: NONE or BLOCKED */
+    @Operation(
+        summary = "Update user status",
+        description = "Updates the status of a user by their ID. " +
+                      "Valid statuses are AVAILABLE, BLOCKED, or DELETED.",
+        security = @SecurityRequirement(name="bearerAuth")
+    )
     @PatchMapping("/{id}/status")
     public UserResponse setStatus(@PathVariable Long id,
                                   @Valid @RequestBody UpdateStatusRequest req) {
         return userService.updateStatus(id, req.status());
     }
 
-    /** DELETE user */
+    @Operation(
+        summary = "Delete a user",
+        description = "Deletes a user from the system by their ID. " +
+                      "This action is irreversible.",
+        security = @SecurityRequirement(name="bearerAuth")
+    )
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteUser(@PathVariable Long id) {

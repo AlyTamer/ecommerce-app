@@ -1,6 +1,6 @@
 package com.aly.ecomapp.testing;
 
-import com.aly.ecomapp.controllers.CategoryDto;
+import com.aly.ecomapp.dto.CategoryDto;
 import com.aly.ecomapp.repository.CategoryRepository;
 import com.aly.ecomapp.repository.ProductRepository;
 import com.aly.ecomapp.entity.Category;

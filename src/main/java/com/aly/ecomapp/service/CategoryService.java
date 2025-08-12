@@ -4,7 +4,7 @@ import com.aly.ecomapp.exception.ProductException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.aly.ecomapp.controllers.CategoryDto;
+import com.aly.ecomapp.dto.CategoryDto;
 import com.aly.ecomapp.entity.Category;
 import com.aly.ecomapp.repository.CategoryRepository;
 import com.aly.ecomapp.repository.ProductRepository;

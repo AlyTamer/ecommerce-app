@@ -96,7 +96,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
-@EnableMethodSecurity(jsr250Enabled = true) // you still can use @RolesAllowed on controllers
+@EnableMethodSecurity
 @Configuration
 public class WebSecurityConfig {
 
@@ -113,7 +113,6 @@ public class WebSecurityConfig {
         return authentication -> {
             UserDetails userDetails;
             try {
-                // principal here is the EMAIL
                 userDetails = userDetailsService.loadUserByUsername(authentication.getPrincipal().toString());
             } catch (Exception e) {
                 throw new UserException(UserExceptionMessages.INVALID_CREDENTIALS);
@@ -141,7 +140,6 @@ public class WebSecurityConfig {
                                 "/webjars/**"
                         ).permitAll()
                         .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login").permitAll()
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 
                         .anyRequest().authenticated()
                 )

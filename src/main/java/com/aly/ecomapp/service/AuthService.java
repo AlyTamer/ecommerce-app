@@ -31,7 +31,7 @@ public class AuthService {
 
     public UserResponse register(RegisterRequest in, Role role) {
         String email = in.email().toLowerCase();
-        if (repo.existsByEmail(email)) throw new IllegalArgumentException("Email already exists");
+        if (repo.existsByEmail(email)) throw new AuthException(AuthExceptionMessages.EMAIL_ALREADY_EXISTS);
 
         AppUser u = new AppUser();
         u.setEmail(email);
@@ -39,6 +39,8 @@ public class AuthService {
         u.setRole(role);
         u.setStatus(UserStatus.AVAILABLE);
         repo.save(u);
+        String token = jwt.generateToken(u.getEmail(), "ROLE_" + u.getRole().name());
+        System.out.println(token);
 
         return map(u);
     }

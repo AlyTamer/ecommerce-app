@@ -1,5 +1,5 @@
 package com.aly.ecomapp.service;
-import com.aly.ecomapp.controllers.ProductDto;
+import com.aly.ecomapp.dto.ProductDto;
 import com.aly.ecomapp.entity.Category;
 import com.aly.ecomapp.entity.Product;
 import com.aly.ecomapp.entity.ProductStatus;
