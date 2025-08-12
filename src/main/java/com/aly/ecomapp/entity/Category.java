@@ -2,6 +2,8 @@ package com.aly.ecomapp.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Date;
+
 @Entity
 @Table(name = "categories")
 @Getter @Setter
@@ -15,6 +17,9 @@ public class Category {
 
     @Column(unique = true, nullable = false)
     private String name;
+    private String slug;
+    private String image;
+
 
     private String description;
 }

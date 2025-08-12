@@ -23,10 +23,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoryAndStatus(Category category, ProductStatus status);
 
     // Search products by name
-    List<Product> findByNameContainingIgnoreCase(String name);
+    List<Product> findByTitleContainingIgnoreCase(String name);
 
     // Search active products by name
-    List<Product> findByNameContainingIgnoreCaseAndStatus(String name, ProductStatus status);
+    List<Product> findByTitleContainingIgnoreCaseAndStatus(String name, ProductStatus status);
 
     // Check if products exist for a category
     boolean existsByCategory(Category category);

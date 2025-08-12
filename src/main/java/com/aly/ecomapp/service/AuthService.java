@@ -32,7 +32,6 @@ public class AuthService {
     public UserResponse register(RegisterRequest in, Role role) {
         String email = in.email().toLowerCase();
         if (repo.existsByEmail(email)) throw new AuthException(AuthExceptionMessages.EMAIL_ALREADY_EXISTS);
-
         AppUser u = new AppUser();
         u.setEmail(email);
         u.setPasswordHash(passwords.hash(in.password()));

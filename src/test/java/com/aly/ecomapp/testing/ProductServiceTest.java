@@ -120,7 +120,7 @@ class ProductServiceTest {
     void searchProducts_ReturnsMatching() {
         Product product = new Product(1L, "Tablet", 300.0, 5, 4.0, electronics, ProductStatus.ACTIVE);
 
-        when(productRepository.findByNameContainingIgnoreCase("Tab")).thenReturn(List.of(product));
+        when(productRepository.findByTitleContainingIgnoreCase("Tab")).thenReturn(List.of(product));
 
         List<ProductDto> result = productService.searchProducts("Tab");
 
