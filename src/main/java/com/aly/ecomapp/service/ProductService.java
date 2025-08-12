@@ -142,4 +142,11 @@ public class ProductService {
         }
         return dto;
     }
+
+    public List<ProductDto> getAllFilteredProducts(String title, Integer catId, Integer priceMin, Integer priceMax) {
+        List<Product> product = productRepository.findAllByCondition(title, catId, priceMin, priceMax);
+        return product.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
 }

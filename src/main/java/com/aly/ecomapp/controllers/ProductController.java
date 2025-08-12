@@ -108,9 +108,22 @@ public class ProductController {
             security = @SecurityRequirement(name = "bearerAuth")
     )
 
+
     public ResponseEntity<ProductDto> updateProductStatus(
             @PathVariable Long id,
             @RequestParam ProductStatus status) {
         return ResponseEntity.ok(productService.updateProductStatus(id, status));
+    }
+    @Operation(
+            summary = "Get all products",
+            description = "Retrieve a list of all products.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @GetMapping("/filter")
+    public ResponseEntity<List<ProductDto>> getAllProductsOnCondition(@RequestParam(required = false) String title,
+                                                                      @RequestParam(required =false) Integer catId ,
+                                                                      @RequestParam(required = false) Integer priceMin,
+                                                                      @RequestParam(required = false) Integer priceMax) {
+        return ResponseEntity.ok(productService.getAllFilteredProducts(title,catId,priceMin,priceMax));
     }
 }
