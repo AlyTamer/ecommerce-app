@@ -8,7 +8,6 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "orders") // avoid reserved keyword 'order'
@@ -19,10 +18,10 @@ public class Order {
 
     @Id
     @GeneratedValue
-    private UUID id;
+    private Long id;
 
     @Column(nullable = false)
-    private UUID userId;
+    private Long userId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -34,8 +33,6 @@ public class Order {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @Lob
-    private String cartSnapshot;  // JSON snapshot of cart at time of order
 
     @PrePersist
     public void onCreate() {

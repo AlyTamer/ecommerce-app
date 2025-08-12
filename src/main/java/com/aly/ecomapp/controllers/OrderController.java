@@ -1,12 +1,12 @@
-package  com.aly.ecomapp.controllers;
+package com.aly.ecomapp.controllers;
 
+import com.aly.ecomapp.dto.OrderDTO;
 import com.aly.ecomapp.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.aly.ecomapp.entity.Order;
+
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -18,26 +18,30 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    // Create an order (request + response are DTOs)
     @PostMapping
-    public ResponseEntity<Order> create(@RequestBody Order order) {
-        Order saved = orderService.create(order);
+    public ResponseEntity<OrderDTO> create(@RequestBody OrderDTO order) {
+        OrderDTO saved = orderService.create(order);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
+    // Get all orders (DTO list)
     @GetMapping
-    public List<Order> all() {
+    public List<OrderDTO> all() {
         return orderService.getAll();
     }
 
+    // Get one order by id (DTO)
     @GetMapping("/{id}")
-    public ResponseEntity<Order> byId(@PathVariable UUID id) {
-        Order found = orderService.getById(id);
+    public ResponseEntity<OrderDTO> byId(@PathVariable Long id) {
+        OrderDTO found = orderService.getById(id);
         if (found == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(found);
     }
 
+    // Delete by id
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         orderService.delete(id);
         return ResponseEntity.noContent().build();
     }

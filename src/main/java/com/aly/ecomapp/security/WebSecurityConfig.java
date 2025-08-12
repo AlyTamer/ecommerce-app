@@ -137,7 +137,11 @@ public class WebSecurityConfig {
                                 "/v3/api-docs",
                                 "/v3/api-docs.yaml",
                                 "/swagger-resources/**",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/api/orders/**",
+                                "/api/orders/",
+                                "/api/order-history",
+                                "/api/order-history/**"
                         ).permitAll()
                         .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login").permitAll()
 
