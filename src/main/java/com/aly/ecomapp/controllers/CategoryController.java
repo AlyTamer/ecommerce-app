@@ -1,6 +1,5 @@
-package com.aly.ecomapp.product.controller;
-import com.aly.ecomapp.product.dto.CategoryDto;
-import com.aly.ecomapp.product.Service.CategoryService;
+package com.aly.ecomapp.controllers;
+import com.aly.ecomapp.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

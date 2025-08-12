@@ -1,12 +1,9 @@
 package com.aly.ecomapp.exception;
-import com.aly.ecomapp.product.exception.CategoryException;
-import com.aly.ecomapp.product.exception.ProductException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
-import java.time.Instant;
 //Event handler to handle all exceptions for the program
 @ControllerAdvice
 public class GlobalExceptionHandler {

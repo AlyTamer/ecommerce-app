@@ -1,4 +1,4 @@
-package com.aly.ecomapp.product.dto;
+package com.aly.ecomapp.controllers;
 import lombok.Data;
 
 @Data

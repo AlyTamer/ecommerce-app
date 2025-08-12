@@ -1,4 +1,4 @@
-package com.aly.ecomapp.product.entity;
+package com.aly.ecomapp.entity;
 public enum ProductStatus {
     ACTIVE,
     INACTIVE, //product not found

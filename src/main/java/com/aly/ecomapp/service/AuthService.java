@@ -7,20 +7,26 @@ import com.aly.ecomapp.dto.UserResponse;
 import com.aly.ecomapp.entity.AppUser;
 import com.aly.ecomapp.entity.Role;
 import com.aly.ecomapp.entity.UserStatus;
+import com.aly.ecomapp.exception.AuthException;
+import com.aly.ecomapp.exception.AuthExceptionMessages;
+import com.aly.ecomapp.exception.UserException;
+import com.aly.ecomapp.exception.UserExceptionMessages;
 import com.aly.ecomapp.repository.AppUserRepository;
 import com.aly.ecomapp.security.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
     private final AppUserRepository repo;
     private final PasswordService passwords;
-    private final JwtUtil jwt; // <-- added
+    private final JwtUtil jwt;
 
+    @Autowired
     public AuthService(AppUserRepository repo, PasswordService passwords, JwtUtil jwt) {
         this.repo = repo;
         this.passwords = passwords;
-        this.jwt = jwt; // <-- store reference
+        this.jwt = jwt;
     }
 
     public UserResponse register(RegisterRequest in, Role role) {
@@ -39,17 +45,16 @@ public class AuthService {
 
     public AuthResponse login(LoginRequest in) {
         var user = repo.findByEmail(in.email().toLowerCase())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+                .orElseThrow(() -> new AuthException(AuthExceptionMessages.INVALID_CREDENTIALS));
 
         if (!passwords.matches(in.password(), user.getPasswordHash())) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new AuthException(AuthExceptionMessages.INVALID_CREDENTIALS);
         }
 
         if (user.getStatus() == UserStatus.BLOCKED) {
-            throw new IllegalStateException("User is blocked");
+            throw new UserException(UserExceptionMessages.USER_IS_BLOCKED);
         }
 
-        // Now we can use jwt
         String token = jwt.generateToken(user.getEmail(), "ROLE_" + user.getRole().name());
         return new AuthResponse(token, user.getRole().name());
     }

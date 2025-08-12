@@ -1,14 +1,17 @@
-package com.aly.ecomapp.product.Service;
-import com.aly.ecomapp.product.dto.ProductDto;
-import com.aly.ecomapp.product.entity.Category;
-import com.aly.ecomapp.product.entity.Product;
-import com.aly.ecomapp.product.entity.ProductStatus;
-import com.aly.ecomapp.product.Repository.CategoryRepository;
-import com.aly.ecomapp.product.Repository.ProductRepository;
+package com.aly.ecomapp.service;
+import com.aly.ecomapp.controllers.ProductDto;
+import com.aly.ecomapp.entity.Category;
+import com.aly.ecomapp.entity.Product;
+import com.aly.ecomapp.entity.ProductStatus;
+import com.aly.ecomapp.exception.CategoryException;
+import com.aly.ecomapp.exception.CategoryExceptionMessages;
+import com.aly.ecomapp.repository.CategoryRepository;
+import com.aly.ecomapp.repository.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.aly.ecomapp.product.exception.ProductException;
-import com.aly.ecomapp.product.exception.ProductExceptionMessages;
+import com.aly.ecomapp.exception.ProductException;
+import com.aly.ecomapp.exception.ProductExceptionMessages;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +22,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
 
+    @Autowired
     public ProductService(ProductRepository productRepository,
                           CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
@@ -39,7 +43,8 @@ public class ProductService {
 
     @Transactional
     public ProductDto createProduct(ProductDto productDto) {
-        Category category = categoryRepository.findById(productDto.getCategoryId()).orElseThrow(() -> new RuntimeException("Category not found"));
+        Category category = categoryRepository.findById(productDto.getCategoryId())
+                .orElseThrow(() -> new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND));
 
         Product product = new Product();
         product.setName(productDto.getName());
@@ -50,7 +55,12 @@ public class ProductService {
                 productDto.getStatus() : ProductStatus.ACTIVE);
         product.setCategory(category);
 
-        Product savedProduct = productRepository.save(product);
+        Product savedProduct;
+        try {
+            savedProduct = productRepository.save(product);
+        } catch (Exception e) {
+            throw new ProductException(ProductExceptionMessages.FAILED_TO_CREATE_PRODUCT,e);
+        }
         return convertToDto(savedProduct);
     }
 
@@ -60,7 +70,7 @@ public class ProductService {
                 .orElseThrow(() -> new ProductException(ProductExceptionMessages.PRODUCT_NOT_FOUND));
 
         Category category = categoryRepository.findById(productDto.getCategoryId())
-                .orElseThrow(() -> new ProductException(ProductExceptionMessages.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND));
 
         existingProduct.setName(productDto.getName());
         existingProduct.setPrice(productDto.getPrice());
@@ -83,7 +93,7 @@ public class ProductService {
 
     public List<ProductDto> getProductsByCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ProductException(ProductExceptionMessages.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND));
 
         return productRepository.findByCategory(category).stream()
                 .map(this::convertToDto)

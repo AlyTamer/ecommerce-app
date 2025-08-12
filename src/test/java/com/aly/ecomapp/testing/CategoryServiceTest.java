@@ -1,10 +1,10 @@
 package com.aly.ecomapp.testing;
 
-import com.aly.ecomapp.product.dto.CategoryDto;
-import com.aly.ecomapp.product.Repository.CategoryRepository;
-import com.aly.ecomapp.product.Repository.ProductRepository;
-import com.aly.ecomapp.product.entity.Category;
-import com.aly.ecomapp.product.Service.CategoryService;
+import com.aly.ecomapp.controllers.CategoryDto;
+import com.aly.ecomapp.repository.CategoryRepository;
+import com.aly.ecomapp.repository.ProductRepository;
+import com.aly.ecomapp.entity.Category;
+import com.aly.ecomapp.service.CategoryService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;

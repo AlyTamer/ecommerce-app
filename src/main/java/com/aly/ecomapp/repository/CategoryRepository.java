@@ -1,7 +1,7 @@
-package com.aly.ecomapp.product.Repository;
+package com.aly.ecomapp.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import com.aly.ecomapp.product.entity.Category;
+import com.aly.ecomapp.entity.Category;
 
 import java.util.List;
 

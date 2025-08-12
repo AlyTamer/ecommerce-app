@@ -1,4 +1,4 @@
-package com.aly.ecomapp.product.entity;
+package com.aly.ecomapp.entity;
 import jakarta.persistence.*;
 import lombok.*;
 

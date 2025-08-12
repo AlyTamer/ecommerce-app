@@ -1,16 +1,15 @@
-package com.aly.ecomapp.product.Service;
-import com.aly.ecomapp.product.exception.ProductExceptionMessages;
-import com.aly.ecomapp.product.exception.ProductException;
+package com.aly.ecomapp.service;
+import com.aly.ecomapp.exception.ProductExceptionMessages;
+import com.aly.ecomapp.exception.ProductException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.aly.ecomapp.product.dto.CategoryDto;
-import com.aly.ecomapp.product.entity.Category;
-import com.aly.ecomapp.product.Repository.CategoryRepository;
-import com.aly.ecomapp.product.Repository.ProductRepository;
-import com.aly.ecomapp.product.exception.ProductExceptionMessages;
-import com.aly.ecomapp.product.exception.ProductException;
-import com.aly.ecomapp.product.exception.CategoryException;
-import com.aly.ecomapp.product.exception.CategoryExceptionMessages;
+import com.aly.ecomapp.controllers.CategoryDto;
+import com.aly.ecomapp.entity.Category;
+import com.aly.ecomapp.repository.CategoryRepository;
+import com.aly.ecomapp.repository.ProductRepository;
+import com.aly.ecomapp.exception.CategoryException;
+import com.aly.ecomapp.exception.CategoryExceptionMessages;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +20,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
 
+    @Autowired
     public CategoryService(CategoryRepository categoryRepository,
                            ProductRepository productRepository) {
         this.categoryRepository = categoryRepository;
@@ -56,7 +56,12 @@ public class CategoryService {
         category.setName(categoryDto.getName());
         category.setDescription(categoryDto.getDescription());
 
-        Category savedCategory = categoryRepository.save(category);
+        Category savedCategory;
+        try {
+            savedCategory = categoryRepository.save(category);
+        } catch (Exception e) {
+            throw new CategoryException(CategoryExceptionMessages.FAILED_TO_CREATE_CATEGORY ,e);
+        }
         return convertToDto(savedCategory);
     }
 
@@ -73,7 +78,12 @@ public class CategoryService {
         existingCategory.setName(categoryDto.getName());
         existingCategory.setDescription(categoryDto.getDescription());
 
-        Category updatedCategory = categoryRepository.save(existingCategory);
+        Category updatedCategory;
+        try {
+            updatedCategory = categoryRepository.save(existingCategory);
+        } catch (Exception e) {
+            throw new CategoryException(CategoryExceptionMessages.FAILED_TO_UPDATE_CATEGORY);
+        }
         return convertToDto(updatedCategory);
     }
 
@@ -86,10 +96,17 @@ public class CategoryService {
             throw new ProductException(ProductExceptionMessages.CANNOT_DELETE_DUE_TO_EXISTING_PRODUCT);
         }
 
-        categoryRepository.delete(category);
+        try {
+            categoryRepository.delete(category);
+        } catch (Exception e) {
+            throw new CategoryException(CategoryExceptionMessages.FAILED_TO_DELETE_CATEGORY,e);
+        }
     }
 
     private CategoryDto convertToDto(Category category) {
+        if(category == null) {
+            throw new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND);
+        }
         CategoryDto dto = new CategoryDto();
         dto.setId(category.getId());
         dto.setName(category.getName());

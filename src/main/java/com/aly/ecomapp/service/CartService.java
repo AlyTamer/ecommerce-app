@@ -1,8 +1,7 @@
 package com.aly.ecomapp.service;
 
 
-import com.aly.ecomapp.exception.CartException;
-import com.aly.ecomapp.exception.CartExceptionMessages;
+import com.aly.ecomapp.exception.*;
 import com.aly.ecomapp.repository.CartRepository;
 import com.aly.ecomapp.dto.CartDTO;
 import com.aly.ecomapp.dto.CartItemDTO;
@@ -23,11 +22,16 @@ import java.util.stream.Collectors;
 @Service
 public class CartService {
 
-    @Autowired
-    private CartRepository cartRepository;
-    private static final int MAX_ITEMS = 10; // cart limit 10
 
-    // calculate total price
+    private CartRepository cartRepository;
+    private static final int MAX_ITEMS = 10;
+
+    @Autowired
+    public CartService(CartRepository cartRepository) {
+        this.cartRepository = cartRepository;
+    }
+
+
     public BigDecimal calculateTotal(List<CartItem> items) {
         if (items == null) return BigDecimal.ZERO;
         return items.stream()
@@ -51,25 +55,28 @@ public class CartService {
         return new CartDTO(cart.getId(), cart.getUserId(), itemDTOs, total);
     }
 
-    // one cart for each user
     public CartDTO createCartForUser(Long userId) {
         if (userId == null) {
-            throw new IllegalArgumentException("User ID cannot be null");
+            throw new UserException(UserExceptionMessages.NULL_USER_ID);
         }
         if (cartRepository.findByUserId(userId) != null) {
-            throw new RuntimeException("User already has a cart.");
+            throw new CartException(CartExceptionMessages.USER_ALREADY_HAS_CART);
         }
         Cart cart = new Cart();
         cart.setUserId(userId);
         cart.setItems(List.of());
-        Cart saved = cartRepository.save(cart);
+        Cart saved;
+        try {
+            saved = cartRepository.save(cart);
+        } catch (Exception e) {
+            throw new CartException(CartExceptionMessages.FAILED_TO_CREATE_CART,e);
+        }
         return toDTO(saved);
     }
 
-    // get cart by ID
     public CartDTO getCartById(Long cartId) {
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found with ID: " + cartId));
+                .orElseThrow(() -> new CartException(CartExceptionMessages.CART_NOT_FOUND));
         return toDTO(cart);
     }
 
@@ -77,83 +84,79 @@ public class CartService {
     public CartDTO getCartByUserId(Long userId) {
         Cart cart = cartRepository.findByUserId(userId);
         if (cart == null) {
-            throw new RuntimeException("No cart found for user ID: " + userId);
+            throw new CartException(CartExceptionMessages.CART_NOT_FOUND);
         }
         return toDTO(cart);
     }
 
-    // get All Carts
     public List<CartDTO> getAllCarts() {
         return cartRepository.findAll().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
-    //  update Cart to add or change items
     public CartDTO updateCart(Long cartId, List<CartItemDTO> itemDTOs) {
         if (itemDTOs == null) {
-            throw new IllegalArgumentException("Item list cannot be null");
+            throw new CartItemException(CartItemExceptionMessages.EMPTY_CART);
         }
         if (itemDTOs.size() > MAX_ITEMS) {
-            throw new RuntimeException("Cannot add more than " + MAX_ITEMS + " items to the cart.");
+            throw new CartException(CartExceptionMessages.ITEM_LIMIT);
         }
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found with ID: " + cartId));
+                .orElseThrow(() -> new CartException(CartExceptionMessages.CART_NOT_FOUND));
 
         List<CartItem> items=new ArrayList<>();
         for (CartItemDTO dto : itemDTOs) {
             CartItem cartItem = new CartItem();
-//            cartItem.setId(dto.getId());
             cartItem.setProductId(dto.getProductId());
             cartItem.setQuantity(dto.getQuantity());
             cartItem.setPrice(dto.getPrice());
             items.add(cartItem);
         }
 
-//        List<CartItem> items = itemDTOs.stream().map(dto -> {
-//            CartItem item = new CartItem();
-//            item.setId(dto.getId());
-//            item.setProductId(dto.getProductId());
-//            item.setQuantity(dto.getQuantity());
-//            item.setPrice(dto.getPrice());
-//            return item;
-//        }).collect(Collectors.toList());
-
-//        cart.setItems(items);
-//        cart.setItems(items);
         cart.getItems().clear();
         cart.getItems().addAll(items);
-        Cart updated = cartRepository.save(cart);
+        Cart updated;
+        try {
+            updated = cartRepository.save(cart);
+        } catch (Exception e) {
+            throw new CartException(CartExceptionMessages.FAILED_TO_UPDATE_CART, e);
+        }
         return toDTO(updated);
     }
 
-    //for checkout
     public CartDTO initiateCheckout(Long cartId) {
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found with ID: " + cartId));
+                .orElseThrow(() -> new CartException(CartExceptionMessages.CART_NOT_FOUND));
 
         if (cart.getItems() == null || cart.getItems().isEmpty()) {
-            throw new RuntimeException("Cannot checkout: Cart is empty");
+            throw new CartException(CartExceptionMessages.EMPTY_CART);
         }
 
-        return toDTO(cart); // Reuse CartDTO to checkout
+        return toDTO(cart);
     }
 
-    // clear cart
     public void clearCart(Long cartId) {
         Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+                .orElseThrow(() -> new CartException(CartExceptionMessages.CART_NOT_FOUND));
 
         cart.getItems().clear();
-        cartRepository.save(cart);
+        try {
+            cartRepository.save(cart);
+        } catch (Exception e) {
+            throw new CartException(CartExceptionMessages.FAILED_TO_CLEAR_CART,e);
+        }
     }
 
-    // delete cart
     public void deleteCart(Long cartId) {
         if (!cartRepository.existsById(cartId)) {
-            throw new RuntimeException("Cart not found with ID: " + cartId);
+            throw new CartException(CartExceptionMessages.CART_NOT_FOUND);
         }
-        cartRepository.deleteById(cartId);
+        try {
+            cartRepository.deleteById(cartId);
+        } catch (Exception e) {
+            throw new CartException(CartExceptionMessages.FAILED_TO_DELETE_CART,e);
+        }
     }
 }
 

@@ -1,9 +1,8 @@
-package com.aly.ecomapp.product.controller;
-import com.aly.ecomapp.product.entity.ProductStatus;
+package com.aly.ecomapp.controllers;
+import com.aly.ecomapp.entity.ProductStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.aly.ecomapp.product.dto.ProductDto;
-import com.aly.ecomapp.product.Service.ProductService;
+import com.aly.ecomapp.service.ProductService;
 
 import java.util.List;
 

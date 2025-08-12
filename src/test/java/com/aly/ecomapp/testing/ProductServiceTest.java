@@ -1,11 +1,11 @@
 package com.aly.ecomapp.testing;
-import com.aly.ecomapp.product.dto.ProductDto;
-import com.aly.ecomapp.product.Repository.CategoryRepository;
-import com.aly.ecomapp.product.Repository.ProductRepository;
-import com.aly.ecomapp.product.Service.ProductService;
-import com.aly.ecomapp.product.entity.Category;
-import com.aly.ecomapp.product.entity.Product;
-import com.aly.ecomapp.product.entity.ProductStatus;
+import com.aly.ecomapp.controllers.ProductDto;
+import com.aly.ecomapp.repository.CategoryRepository;
+import com.aly.ecomapp.repository.ProductRepository;
+import com.aly.ecomapp.service.ProductService;
+import com.aly.ecomapp.entity.Category;
+import com.aly.ecomapp.entity.Product;
+import com.aly.ecomapp.entity.ProductStatus;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package com.aly.ecomapp.controller;
+package com.aly.ecomapp.controllers;
 
 
 

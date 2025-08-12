@@ -1,5 +1,5 @@
-package com.aly.ecomapp.product.dto;
-import com.aly.ecomapp.product.entity.ProductStatus;
+package com.aly.ecomapp.controllers;
+import com.aly.ecomapp.entity.ProductStatus;
 import lombok.Data;
 
 @Data
