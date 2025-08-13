@@ -12,37 +12,38 @@ import java.util.List;
 @RequestMapping("/api/orders")
 public class OrderController {
 
-    private final OrderService orderService;
+    private final OrderService service;
 
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
+    public OrderController(OrderService service) {
+        this.service = service;
     }
 
-    // Create an order (request + response are DTOs)
     @PostMapping
     public ResponseEntity<OrderDTO> create(@RequestBody OrderDTO order) {
-        OrderDTO saved = orderService.create(order);
+        OrderDTO saved = service.create(order);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
-    // Get all orders (DTO list)
     @GetMapping
     public List<OrderDTO> all() {
-        return orderService.getAll();
+        return service.getAll();
     }
 
-    // Get one order by id (DTO)
     @GetMapping("/{id}")
     public ResponseEntity<OrderDTO> byId(@PathVariable Long id) {
-        OrderDTO found = orderService.getById(id);
-        if (found == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(found);
+        OrderDTO found = service.getById(id);
+        return (found == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(found);
     }
 
-    // Delete by id
+    @PutMapping("/{id}")
+    public ResponseEntity<OrderDTO> update(@PathVariable Long id, @RequestBody OrderDTO order) {
+        OrderDTO saved = service.update(id, order);
+        return (saved == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(saved);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        orderService.delete(id);
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

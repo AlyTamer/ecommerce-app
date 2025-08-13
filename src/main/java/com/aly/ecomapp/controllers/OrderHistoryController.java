@@ -12,33 +12,42 @@ import java.util.List;
 @RequestMapping("/api/order-history")
 public class OrderHistoryController {
 
-    private final OrderHistoryService orderHistoryService;
+    private final OrderHistoryService service;
 
-    public OrderHistoryController(OrderHistoryService orderHistoryService) {
-        this.orderHistoryService = orderHistoryService;
+    public OrderHistoryController(OrderHistoryService service) {
+        this.service = service;
     }
 
     @PostMapping
     public ResponseEntity<OrderHistoryDTO> create(@RequestBody OrderHistoryDTO dto) {
-        OrderHistoryDTO saved = orderHistoryService.create(dto);
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+        return new ResponseEntity<>(service.create(dto), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<OrderHistoryDTO> update(@PathVariable Long id, @RequestBody OrderHistoryDTO dto) {
+        OrderHistoryDTO saved = service.update(id, dto);
+        return (saved == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(saved);
     }
 
     @GetMapping
     public List<OrderHistoryDTO> all() {
-        return orderHistoryService.getAll();
+        return service.getAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<OrderHistoryDTO> byId(@PathVariable Long id) {
-        OrderHistoryDTO found = orderHistoryService.getById(id);
-        if (found == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(found);
+        OrderHistoryDTO found = service.getById(id);
+        return (found == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(found);
+    }
+
+    @GetMapping("/order/{orderId}")
+    public List<OrderHistoryDTO> byOrder(@PathVariable Long orderId) {
+        return service.getByOrder(orderId);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        orderHistoryService.delete(id);
+        service.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

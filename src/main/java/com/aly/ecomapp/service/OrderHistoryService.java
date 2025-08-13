@@ -1,9 +1,8 @@
 package com.aly.ecomapp.service;
 
 import com.aly.ecomapp.dto.OrderHistoryDTO;
+import com.aly.ecomapp.entity.Order;
 import com.aly.ecomapp.entity.OrderHistory;
-import com.aly.ecomapp.exception.OrderHistoryException;
-import com.aly.ecomapp.exception.OrderHistoryExceptionMessages;
 import com.aly.ecomapp.repository.OrderHistoryRepository;
 import com.aly.ecomapp.repository.OrderRepository;
 import org.springframework.stereotype.Service;
@@ -13,66 +12,80 @@ import java.util.stream.Collectors;
 
 @Service
 public class OrderHistoryService {
-    private final OrderRepository orderRepository;
-    private final OrderHistoryRepository orderHistoryRepository;
 
-    public OrderHistoryService(OrderHistoryRepository orderHistoryRepository, OrderRepository orderRepository) {
-        this.orderHistoryRepository = orderHistoryRepository;
+    private final OrderHistoryRepository historyRepository;
+    private final OrderRepository orderRepository;
+
+    public OrderHistoryService(OrderHistoryRepository historyRepository,
+                               OrderRepository orderRepository) {
+        this.historyRepository = historyRepository;
         this.orderRepository = orderRepository;
     }
 
     public OrderHistoryDTO create(OrderHistoryDTO dto) {
-        OrderHistory history = mapToEntity(dto);
-        OrderHistory saved = null;
-        try {
-            saved = orderHistoryRepository.save(history);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        OrderHistory entity = toEntity(dto);
+        entity.setId(null);
+        OrderHistory saved = historyRepository.save(entity);
+        return toDTO(saved);
+    }
+
+    public OrderHistoryDTO update(Long id, OrderHistoryDTO dto) {
+        OrderHistory history = historyRepository.findById(id).orElse(null);
+        if (history == null) return null;
+
+        if (dto.getStatus() != null) history.setStatus(dto.getStatus());
+        if (dto.getTotalPrice() != null) history.setTotalPrice(dto.getTotalPrice());
+        if (dto.getUserId() != null) history.setUserId(dto.getUserId());
+        if (dto.getOrderId() != null && !dto.getOrderId().equals(history.getOrder().getId())) {
+            Order ord = orderRepository.findById(dto.getOrderId()).orElse(null);
+            if (ord != null) history.setOrder(ord);
         }
-        return mapToDTO(saved);
+
+        return toDTO(historyRepository.save(history));
     }
 
     public OrderHistoryDTO getById(Long id) {
-        return orderHistoryRepository.findById(id)
-                .map(this::mapToDTO)
-                .orElse(null);
+        return historyRepository.findById(id).map(this::toDTO).orElse(null);
     }
 
     public List<OrderHistoryDTO> getAll() {
-        return orderHistoryRepository.findAll()
-                .stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
+        return historyRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
+    }
+
+    public List<OrderHistoryDTO> getByOrder(Long orderId) {
+        return historyRepository.findByOrderId(orderId).stream().map(this::toDTO).collect(Collectors.toList());
     }
 
     public void delete(Long id) {
-        try {
-            orderHistoryRepository.deleteById(id);
-        } catch (Exception e) {
-            throw new OrderHistoryException(OrderHistoryExceptionMessages.FAILED_TO_DELETE);
-        }
+        historyRepository.deleteById(id);
     }
 
-    private OrderHistoryDTO mapToDTO(OrderHistory history) {
-        OrderHistoryDTO dto = new OrderHistoryDTO();
-        dto.setId(history.getId());
-        dto.setOrderId(history.getOrder().getId());
-        dto.setStatus(history.getStatus());
-        dto.setTotalPrice(history.getTotalPrice());
-        dto.setChangedAt(history.getChangedAt());
+    // mapping
 
+    private OrderHistoryDTO toDTO(OrderHistory h) {
+        OrderHistoryDTO dto = new OrderHistoryDTO();
+        dto.setId(h.getId());
+        dto.setOrderId(h.getOrder().getId());
+        dto.setUserId(h.getUserId());
+        dto.setStatus(h.getStatus());
+        dto.setTotalPrice(h.getTotalPrice());
+        dto.setChangedAt(h.getChangedAt());
         return dto;
     }
 
-    private OrderHistory mapToEntity(OrderHistoryDTO dto) {
-        OrderHistory history = new OrderHistory();
-        history.setId(dto.getId());
-        history.setOrder(orderRepository.findById(dto.getOrderId()).orElseThrow(()-> new OrderHistoryException(OrderHistoryExceptionMessages.FAILED_TO_CREATE_ORDER_HISTROY)));
-        history.setStatus(dto.getStatus());
-        history.setTotalPrice(dto.getTotalPrice());
-        history.setChangedAt(dto.getChangedAt());
+    private OrderHistory toEntity(OrderHistoryDTO dto) {
+        OrderHistory h = new OrderHistory();
+        h.setId(dto.getId());
 
-        return history;
+        // IMPORTANT: link to Order using orderRepository (this fixes your earlier error)
+        Order order = orderRepository.findById(dto.getOrderId())
+                .orElseThrow(() -> new IllegalArgumentException("Order not found: " + dto.getOrderId()));
+        h.setOrder(order);
+
+        h.setUserId(dto.getUserId() != null ? dto.getUserId() : order.getUserId());
+        h.setStatus(dto.getStatus());
+        h.setTotalPrice(dto.getTotalPrice());
+        h.setChangedAt(dto.getChangedAt());
+        return h;
     }
 }
-

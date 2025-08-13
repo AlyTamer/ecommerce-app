@@ -1,15 +1,12 @@
 package com.aly.ecomapp.dto;
 
 import com.aly.ecomapp.entity.OrderStatus;
-import lombok.*;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class OrderDTO {
     private Long id;
     private Long userId;
@@ -17,5 +14,4 @@ public class OrderDTO {
     private BigDecimal totalPrice;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
 }

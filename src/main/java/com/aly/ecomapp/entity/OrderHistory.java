@@ -10,33 +10,33 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "order_history")
-@Getter
-@Setter
-@NoArgsConstructor
+@Getter @Setter @NoArgsConstructor
 public class OrderHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    // many history rows belong to one order
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private OrderStatus status; // Status at this point in history
+    @Column(nullable = false)
+    private OrderStatus status;
 
-    @Column(precision = 19, scale = 2)
+    @Column(name = "total_price", precision = 19, scale = 2)
     private BigDecimal totalPrice;
 
+    @Column(name = "changed_at")
     private LocalDateTime changedAt;
 
     @PrePersist
     public void onCreate() {
-        this.changedAt = LocalDateTime.now();
+        if (this.changedAt == null) this.changedAt = LocalDateTime.now();
     }
 }
