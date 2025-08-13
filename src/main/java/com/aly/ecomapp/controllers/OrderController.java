@@ -24,6 +24,12 @@ public class OrderController {
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<OrderDTO> update(@PathVariable Long id, @RequestBody OrderDTO order) {
+        OrderDTO saved = service.update(id, order);
+        return saved == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(saved);
+    }
+
     @GetMapping
     public List<OrderDTO> all() {
         return service.getAll();
@@ -33,12 +39,6 @@ public class OrderController {
     public ResponseEntity<OrderDTO> byId(@PathVariable Long id) {
         OrderDTO found = service.getById(id);
         return (found == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(found);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<OrderDTO> update(@PathVariable Long id, @RequestBody OrderDTO order) {
-        OrderDTO saved = service.update(id, order);
-        return (saved == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(saved);
     }
 
     @DeleteMapping("/{id}")

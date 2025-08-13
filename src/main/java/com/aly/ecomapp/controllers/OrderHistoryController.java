@@ -20,13 +20,14 @@ public class OrderHistoryController {
 
     @PostMapping
     public ResponseEntity<OrderHistoryDTO> create(@RequestBody OrderHistoryDTO dto) {
-        return new ResponseEntity<>(service.create(dto), HttpStatus.CREATED);
+        OrderHistoryDTO saved = service.create(dto);
+        return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<OrderHistoryDTO> update(@PathVariable Long id, @RequestBody OrderHistoryDTO dto) {
         OrderHistoryDTO saved = service.update(id, dto);
-        return (saved == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(saved);
+        return saved == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(saved);
     }
 
     @GetMapping
@@ -38,11 +39,6 @@ public class OrderHistoryController {
     public ResponseEntity<OrderHistoryDTO> byId(@PathVariable Long id) {
         OrderHistoryDTO found = service.getById(id);
         return (found == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(found);
-    }
-
-    @GetMapping("/order/{orderId}")
-    public List<OrderHistoryDTO> byOrder(@PathVariable Long orderId) {
-        return service.getByOrder(orderId);
     }
 
     @DeleteMapping("/{id}")

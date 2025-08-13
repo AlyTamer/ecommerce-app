@@ -6,86 +6,101 @@ import com.aly.ecomapp.entity.OrderHistory;
 import com.aly.ecomapp.repository.OrderHistoryRepository;
 import com.aly.ecomapp.repository.OrderRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class OrderHistoryService {
 
-    private final OrderHistoryRepository historyRepository;
+    private static final String ORDER_HISTORY_NOT_FOUND = "Order history not found";
+    private static final String ORDER_NOT_FOUND = "Order not found";
+
+    private final OrderHistoryRepository orderHistoryRepository;
     private final OrderRepository orderRepository;
 
-    public OrderHistoryService(OrderHistoryRepository historyRepository,
+    public OrderHistoryService(OrderHistoryRepository orderHistoryRepository,
                                OrderRepository orderRepository) {
-        this.historyRepository = historyRepository;
+        this.orderHistoryRepository = orderHistoryRepository;
         this.orderRepository = orderRepository;
     }
 
+    @Transactional
     public OrderHistoryDTO create(OrderHistoryDTO dto) {
-        OrderHistory entity = toEntity(dto);
-        entity.setId(null);
-        OrderHistory saved = historyRepository.save(entity);
-        return toDTO(saved);
-    }
+        Order order = orderRepository.findById(dto.getOrderId())
+                .orElseThrow(() -> new IllegalArgumentException(ORDER_NOT_FOUND));
 
-    public OrderHistoryDTO update(Long id, OrderHistoryDTO dto) {
-        OrderHistory history = historyRepository.findById(id).orElse(null);
-        if (history == null) return null;
+        OrderHistory history = new OrderHistory();
+        history.setOrder(order);
+        history.setStatus(dto.getStatus());
+        history.setTotalPrice(dto.getTotalPrice());
+        history.setChangedAt(dto.getChangedAt() != null ? dto.getChangedAt() : LocalDateTime.now());
 
-        if (dto.getStatus() != null) history.setStatus(dto.getStatus());
-        if (dto.getTotalPrice() != null) history.setTotalPrice(dto.getTotalPrice());
-        if (dto.getUserId() != null) history.setUserId(dto.getUserId());
-        if (dto.getOrderId() != null && !dto.getOrderId().equals(history.getOrder().getId())) {
-            Order ord = orderRepository.findById(dto.getOrderId()).orElse(null);
-            if (ord != null) history.setOrder(ord);
-        }
+        // if your OrderHistory entity has userId column:
+        try {
+            var userIdField = OrderHistory.class.getDeclaredField("userId");
+            userIdField.setAccessible(true);
+            userIdField.set(history, order.getUserId());
+        } catch (NoSuchFieldException | IllegalAccessException ignored) {}
 
-        return toDTO(historyRepository.save(history));
+        OrderHistory saved = orderHistoryRepository.save(history);
+        return mapToDTO(saved);
     }
 
     public OrderHistoryDTO getById(Long id) {
-        return historyRepository.findById(id).map(this::toDTO).orElse(null);
+        return orderHistoryRepository.findById(id)
+                .map(this::mapToDTO)
+                .orElse(null);
     }
 
     public List<OrderHistoryDTO> getAll() {
-        return historyRepository.findAll().stream().map(this::toDTO).collect(Collectors.toList());
+        return orderHistoryRepository.findAll()
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
-    public List<OrderHistoryDTO> getByOrder(Long orderId) {
-        return historyRepository.findByOrderId(orderId).stream().map(this::toDTO).collect(Collectors.toList());
+    @Transactional
+    public OrderHistoryDTO update(Long id, OrderHistoryDTO dto) {
+        OrderHistory history = orderHistoryRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException(ORDER_HISTORY_NOT_FOUND));
+
+        // allow changing status/price/time and (optionally) re-point to another order
+        if (dto.getOrderId() != null && !dto.getOrderId().equals(history.getOrder().getId())) {
+            Order order = orderRepository.findById(dto.getOrderId())
+                    .orElseThrow(() -> new IllegalArgumentException(ORDER_NOT_FOUND));
+            history.setOrder(order);
+            try {
+                var userIdField = OrderHistory.class.getDeclaredField("userId");
+                userIdField.setAccessible(true);
+                userIdField.set(history, order.getUserId());
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {}
+        }
+
+        if (dto.getStatus() != null) history.setStatus(dto.getStatus());
+        if (dto.getTotalPrice() != null) history.setTotalPrice(dto.getTotalPrice());
+        history.setChangedAt(dto.getChangedAt() != null ? dto.getChangedAt() : LocalDateTime.now());
+
+        OrderHistory saved = orderHistoryRepository.save(history);
+        return mapToDTO(saved);
     }
 
     public void delete(Long id) {
-        historyRepository.deleteById(id);
+        if (!orderHistoryRepository.existsById(id)) {
+            throw new IllegalArgumentException(ORDER_HISTORY_NOT_FOUND);
+        }
+        orderHistoryRepository.deleteById(id);
     }
 
-    // mapping
-
-    private OrderHistoryDTO toDTO(OrderHistory h) {
+    private OrderHistoryDTO mapToDTO(OrderHistory history) {
         OrderHistoryDTO dto = new OrderHistoryDTO();
-        dto.setId(h.getId());
-        dto.setOrderId(h.getOrder().getId());
-        dto.setUserId(h.getUserId());
-        dto.setStatus(h.getStatus());
-        dto.setTotalPrice(h.getTotalPrice());
-        dto.setChangedAt(h.getChangedAt());
+        dto.setId(history.getId());
+        dto.setOrderId(history.getOrder() != null ? history.getOrder().getId() : null);
+        dto.setStatus(history.getStatus());
+        dto.setTotalPrice(history.getTotalPrice());
+        dto.setChangedAt(history.getChangedAt());
         return dto;
-    }
-
-    private OrderHistory toEntity(OrderHistoryDTO dto) {
-        OrderHistory h = new OrderHistory();
-        h.setId(dto.getId());
-
-        // IMPORTANT: link to Order using orderRepository (this fixes your earlier error)
-        Order order = orderRepository.findById(dto.getOrderId())
-                .orElseThrow(() -> new IllegalArgumentException("Order not found: " + dto.getOrderId()));
-        h.setOrder(order);
-
-        h.setUserId(dto.getUserId() != null ? dto.getUserId() : order.getUserId());
-        h.setStatus(dto.getStatus());
-        h.setTotalPrice(dto.getTotalPrice());
-        h.setChangedAt(dto.getChangedAt());
-        return h;
     }
 }
