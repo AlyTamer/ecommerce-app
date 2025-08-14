@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/products")
-@AllowedUser
+
 public class ProductController {
 
     private final ProductService productService;
@@ -24,7 +24,7 @@ public class ProductController {
         this.productService = productService;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    
     @Operation(
             summary = "Get all products",
             description = "Retrieve a list of all products.",
@@ -45,7 +45,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getProductById(id));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    
     @PostMapping
     @Operation(
             summary = "Create a new product",
@@ -56,7 +56,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.createProduct(createDto));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    
     @PutMapping("/{id}")
     @Operation(
             summary = "Update an existing product",
@@ -69,7 +69,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.updateProduct(id, createDto));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    
     @DeleteMapping("/{id}")
     @Operation(
             summary = "Delete a product",
@@ -101,7 +101,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.searchProducts(query));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    
     @PatchMapping("/{id}/status")
     @Operation(
             summary = "Update product status",

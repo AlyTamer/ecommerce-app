@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@AllowedUser
+
 @RequestMapping("/cart")
 public class CartController {
 
     @Autowired
     private CartService cartService;
 
-    @PreAuthorize("hasRole('ADMIN')")
+    
     @Operation(
         summary = "Create a new cart for a user",
         description = "Creates a new cart for the specified user ID. " +
@@ -33,7 +33,7 @@ public class CartController {
         return new ResponseEntity<>(cartDTO, HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    
     @Operation(
         summary = "Get cart by ID",
         description = "Retrieves the cart details for the specified cart ID. " +
@@ -57,7 +57,7 @@ public class CartController {
         return ResponseEntity.ok(cartDTO);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    
     @Operation(
         summary = "Get all carts",
         description = "Retrieves a list of all carts in the system. " +
@@ -69,7 +69,7 @@ public class CartController {
         List<CartDTO> carts = cartService.getAllCarts();
         return ResponseEntity.ok(carts);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+    
     @Operation(
         summary = "Update cart",
         description = "Updates the items in the specified cart. " +
@@ -108,7 +108,7 @@ public class CartController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    
     @Operation(
             summary ="Deletes entire cart",
             security = @SecurityRequirement(name="bearerAuth")

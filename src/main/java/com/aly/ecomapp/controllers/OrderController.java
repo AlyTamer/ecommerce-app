@@ -30,7 +30,7 @@ public class OrderController {
             description = "Retrieve a list of all orders.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    @AllowedUser
+    
     public ResponseEntity<List<OrderDTO>> getAllOrdersByUserId(@RequestParam Long userId) {
         List<OrderDTO> orders = service.getAllOrdersByUserId(userId);
         return ResponseEntity.ok(orders);
@@ -42,7 +42,7 @@ public class OrderController {
             description = "Create a new order with the provided details.\n Admin only method",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    @PreAuthorize("hasRole('ADMIN')")
+    
     public ResponseEntity<OrderDTO> create(@RequestBody OrderDTO order) {
         OrderDTO saved = service.create(order);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
@@ -54,7 +54,7 @@ public class OrderController {
             description = "Update an existing order with the provided details.\n Admin only method",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    @PreAuthorize("hasRole('ADMIN')")
+    
     public ResponseEntity<OrderDTO> update(@PathVariable Long id, @RequestBody OrderDTO order) {
         OrderDTO saved = service.update(id, order);
         return saved == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(saved);
@@ -66,7 +66,7 @@ public class OrderController {
             description = "Retrieve a list of all orders.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    @PreAuthorize("hasRole('ADMIN')")
+    
     public List<OrderDTO> all() {
         return service.getAll();
     }
@@ -77,7 +77,7 @@ public class OrderController {
             description = "Retrieve a specific order by its ID.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    @PreAuthorize("hasRole('ADMIN')")
+    
     public ResponseEntity<OrderDTO> byId(@PathVariable Long id) {
         OrderDTO found = service.getById(id);
         return (found == null) ? ResponseEntity.notFound().build() : ResponseEntity.ok(found);
@@ -89,7 +89,7 @@ public class OrderController {
             description = "Delete an order by its ID.\n Admin only method",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    @PreAuthorize("hasRole('ADMIN')")
+    
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

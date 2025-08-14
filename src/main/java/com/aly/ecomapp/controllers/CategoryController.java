@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/categories")
-@AllowedUser
+
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -43,7 +43,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.getCategoryById(id));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    
     @PostMapping("/create")
     @Operation(
         summary = "Create a new category",
@@ -55,7 +55,7 @@ public class CategoryController {
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    
     @PutMapping("/{id}")
     @Operation(
         summary = "Update an existing category",
@@ -68,7 +68,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.updateCategory(id, updateDto));
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    
     @DeleteMapping("/{id}")
     @Operation(
         summary = "Delete a category",

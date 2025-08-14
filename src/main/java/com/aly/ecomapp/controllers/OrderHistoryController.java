@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/order-history")
-@PreAuthorize("hasRole('ADMIN')")
+
 public class OrderHistoryController {
 
     private final OrderHistoryService service;
@@ -29,7 +29,7 @@ public class OrderHistoryController {
             description = "Retrieve a list of all order history entries.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    @AllowedUser
+    
     public ResponseEntity<List<OrderHistoryDTO>> getAllOrderHistories(@RequestParam Long userId) {
         List<OrderHistoryDTO> orderHistories = service.getAllOrderHistories(userId);
         return ResponseEntity.ok(orderHistories);
