@@ -23,7 +23,7 @@ public class OrderHistoryController {
         this.service = service;
     }
 
-    @GetMapping
+    @GetMapping("/user")
     @Operation(
             summary = "Get all order histroy for specific user",
             description = "Retrieve a list of all order history entries.",
