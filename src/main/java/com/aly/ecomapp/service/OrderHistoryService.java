@@ -105,6 +105,7 @@ public class OrderHistoryService {
         dto.setStatus(history.getStatus());
         dto.setTotalPrice(history.getTotalPrice());
         dto.setChangedAt(history.getChangedAt());
+        dto.setUserId(history.getUserId());
         return dto;
     }
 
