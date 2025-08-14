@@ -185,7 +185,7 @@ public class ProductService {
     private ProductDto convertToDto(Product product) {
         ProductDto dto = new ProductDto();
         dto.setId(product.getId());
-        dto.setName(product.getTitle());
+        dto.setTitle(product.getTitle());
         dto.setPrice(product.getPrice());
         dto.setQuantity(product.getQuantity());
         dto.setRating(product.getRating());

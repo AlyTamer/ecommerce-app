@@ -1,11 +1,10 @@
 package com.aly.ecomapp.dto;
-import com.aly.ecomapp.entity.ProductStatus;
 import lombok.Data;
 
 @Data
 public class ProductDto {
     private Long id;
-    private String name;
+    private String title;
     private Double price;
     private Integer quantity;
     private Double rating;
