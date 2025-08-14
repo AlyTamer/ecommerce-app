@@ -1,6 +1,7 @@
 package com.aly.ecomapp.testing;
 
 import com.aly.ecomapp.dto.CategoryDto;
+import com.aly.ecomapp.dto.CategoryRequestDto;
 import com.aly.ecomapp.repository.CategoryRepository;
 import com.aly.ecomapp.repository.ProductRepository;
 import com.aly.ecomapp.entity.Category;
@@ -50,22 +51,22 @@ class CategoryServiceTest {
     void testUpdateCategory_Success() {
         Category existing = new Category(1L, "OldName", "OldDesc");
 
-        CategoryDto update = new CategoryDto();
-        update.setName("NewName");
-        update.setDescription("Updated");
+        CategoryRequestDto updateDto = new CategoryRequestDto();
+        updateDto.setName("NewName");
+        updateDto.setDescription("Updated");
 
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(categoryRepository.existsByName("NewName")).thenReturn(false);
         when(categoryRepository.save(any(Category.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        CategoryDto result = categoryService.updateCategory(1L, update);
+        CategoryDto result = categoryService.updateCategory(1L, updateDto);
 
         assertEquals("NewName", result.getName());
         assertEquals("Updated", result.getDescription());
     }
     @Test
     void testCreateCategory_Success() {
-        CategoryDto dto = new CategoryDto();
+        CategoryRequestDto dto = new CategoryRequestDto();
         dto.setName("Clothing");
         dto.setDescription("Fashion & apparel");
 
