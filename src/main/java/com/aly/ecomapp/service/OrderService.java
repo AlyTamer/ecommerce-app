@@ -52,13 +52,7 @@ public class OrderService {
         snap.setStatus(saved.getStatus());
         snap.setTotalPrice(saved.getTotalPrice());
         snap.setChangedAt(LocalDateTime.now());
-//        try {
-//            var userIdField = OrderHistory.class.getDeclaredField("userId");
-//            userIdField.setAccessible(true);
-//            userIdField.set(snap, saved.getUserId());
-//        } catch (Exception e) {
-//            throw new OrderException(OrderExceptionMessages.ORDER_CREATION_FAILED);
-//        }
+
 
         try {
             orderHistoryRepository.save(snap);
@@ -79,7 +73,7 @@ public class OrderService {
         if (dto.getUserId() != null) existing.setUserId(dto.getUserId());
         existing.setUpdatedAt(LocalDateTime.now());
 
-        Order saved = null;
+        Order saved;
         try {
             saved = orderRepository.save(existing);
         } catch (Exception e) {
@@ -92,13 +86,7 @@ public class OrderService {
         snap.setTotalPrice(saved.getTotalPrice());
         snap.setChangedAt(LocalDateTime.now());
 
-//        try {
-//            var userIdField = OrderHistory.class.getDeclaredField("userId");
-//            userIdField.setAccessible(true);
-//            userIdField.set(snap, saved.getUserId());
-//        } catch (Exception e) {
-//            throw new OrderException(OrderExceptionMessages.ORDER_UPDATE_FAILED);
-//        }
+
 
         try {
             orderHistoryRepository.save(snap);

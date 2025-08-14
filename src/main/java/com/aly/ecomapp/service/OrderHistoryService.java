@@ -37,13 +37,7 @@ public class OrderHistoryService {
         history.setStatus(dto.getStatus());
         history.setTotalPrice(dto.getTotalPrice());
         history.setChangedAt(dto.getChangedAt() != null ? dto.getChangedAt() : LocalDateTime.now());
-//        try {
-//            var userIdField = OrderHistory.class.getDeclaredField("userId");
-//            userIdField.setAccessible(true);
-//            userIdField.set(history, order.getUserId());
-//        } catch (Exception e) {
-//            throw new OrderHistoryException(OrderHistoryExceptionMessages.FAILED_TO_CREATE_ORDER_HISTROY);
-//        }
+
 
         OrderHistory saved;
         try {
@@ -77,13 +71,7 @@ public class OrderHistoryService {
             Order order = orderRepository.findById(dto.getOrderId())
                     .orElseThrow(() -> new OrderHistoryException(OrderHistoryExceptionMessages.ORDER_HISTORY_NOT_FOUND));
             history.setOrder(order);
-//            try {
-//                var userIdField = OrderHistory.class.getDeclaredField("userId");
-//                userIdField.setAccessible(true);
-//                userIdField.set(history, order.getUserId());
-//            } catch (Exception e) {
-//                throw new OrderHistoryException(OrderHistoryExceptionMessages.FAILED_TO_CREATE_ORDER_HISTROY);
-//            }
+
         }
 
         if (dto.getStatus() != null) history.setStatus(dto.getStatus());
@@ -103,7 +91,11 @@ public class OrderHistoryService {
         if (!orderHistoryRepository.existsById(id)) {
             throw new OrderHistoryException(OrderHistoryExceptionMessages.ORDER_HISTORY_NOT_FOUND);
         }
-        orderHistoryRepository.deleteById(id);
+        try {
+            orderHistoryRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new OrderHistoryException(OrderHistoryExceptionMessages.FAILED_TO_DELETE);
+        }
     }
 
     private OrderHistoryDTO mapToDTO(OrderHistory history) {

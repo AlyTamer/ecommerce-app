@@ -5,11 +5,9 @@ import com.aly.ecomapp.security.AllowedUser;
 import com.aly.ecomapp.service.OrderHistoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,7 +30,7 @@ public class OrderHistoryController {
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @AllowedUser
-    public ResponseEntity<List<OrderHistoryDTO>> getAllOrderHistories(@RequestParam (required = true) Long userId) {
+    public ResponseEntity<List<OrderHistoryDTO>> getAllOrderHistories(@RequestParam Long userId) {
         List<OrderHistoryDTO> orderHistories = service.getAllOrderHistories(userId);
         return ResponseEntity.ok(orderHistories);
     }

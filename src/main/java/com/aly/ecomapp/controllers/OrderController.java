@@ -31,7 +31,7 @@ public class OrderController {
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @AllowedUser
-    public ResponseEntity<List<OrderDTO>> getAllOrdersByUserId(@RequestParam(required = true) Long userId) {
+    public ResponseEntity<List<OrderDTO>> getAllOrdersByUserId(@RequestParam Long userId) {
         List<OrderDTO> orders = service.getAllOrdersByUserId(userId);
         return ResponseEntity.ok(orders);
     }
