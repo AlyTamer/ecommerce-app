@@ -3,6 +3,8 @@ package com.aly.ecomapp.service;
 import com.aly.ecomapp.dto.OrderHistoryDTO;
 import com.aly.ecomapp.entity.Order;
 import com.aly.ecomapp.entity.OrderHistory;
+import com.aly.ecomapp.exception.OrderHistoryException;
+import com.aly.ecomapp.exception.OrderHistoryExceptionMessages;
 import com.aly.ecomapp.repository.OrderHistoryRepository;
 import com.aly.ecomapp.repository.OrderRepository;
 import org.springframework.stereotype.Service;
@@ -15,8 +17,7 @@ import java.util.stream.Collectors;
 @Service
 public class OrderHistoryService {
 
-    private static final String ORDER_HISTORY_NOT_FOUND = "Order history not found";
-    private static final String ORDER_NOT_FOUND = "Order not found";
+
 
     private final OrderHistoryRepository orderHistoryRepository;
     private final OrderRepository orderRepository;
@@ -30,29 +31,34 @@ public class OrderHistoryService {
     @Transactional
     public OrderHistoryDTO create(OrderHistoryDTO dto) {
         Order order = orderRepository.findById(dto.getOrderId())
-                .orElseThrow(() -> new IllegalArgumentException(ORDER_NOT_FOUND));
-
+                .orElseThrow(() -> new OrderHistoryException(OrderHistoryExceptionMessages.ORDER_HISTORY_NOT_FOUND));
         OrderHistory history = new OrderHistory();
         history.setOrder(order);
         history.setStatus(dto.getStatus());
         history.setTotalPrice(dto.getTotalPrice());
         history.setChangedAt(dto.getChangedAt() != null ? dto.getChangedAt() : LocalDateTime.now());
+//        try {
+//            var userIdField = OrderHistory.class.getDeclaredField("userId");
+//            userIdField.setAccessible(true);
+//            userIdField.set(history, order.getUserId());
+//        } catch (Exception e) {
+//            throw new OrderHistoryException(OrderHistoryExceptionMessages.FAILED_TO_CREATE_ORDER_HISTROY);
+//        }
 
-        // if your OrderHistory entity has userId column:
+        OrderHistory saved;
         try {
-            var userIdField = OrderHistory.class.getDeclaredField("userId");
-            userIdField.setAccessible(true);
-            userIdField.set(history, order.getUserId());
-        } catch (NoSuchFieldException | IllegalAccessException ignored) {}
-
-        OrderHistory saved = orderHistoryRepository.save(history);
+            saved = orderHistoryRepository.save(history);
+        } catch (Exception e) {
+            throw new OrderHistoryException(OrderHistoryExceptionMessages.FAILED_TO_CREATE_ORDER_HISTROY);
+        }
         return mapToDTO(saved);
     }
+
 
     public OrderHistoryDTO getById(Long id) {
         return orderHistoryRepository.findById(id)
                 .map(this::mapToDTO)
-                .orElse(null);
+                .orElseThrow(()-> new OrderHistoryException(OrderHistoryExceptionMessages.ORDER_HISTORY_NOT_FOUND));
     }
 
     public List<OrderHistoryDTO> getAll() {
@@ -65,31 +71,37 @@ public class OrderHistoryService {
     @Transactional
     public OrderHistoryDTO update(Long id, OrderHistoryDTO dto) {
         OrderHistory history = orderHistoryRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(ORDER_HISTORY_NOT_FOUND));
+                .orElseThrow(() -> new OrderHistoryException(OrderHistoryExceptionMessages.ORDER_HISTORY_NOT_FOUND));
 
-        // allow changing status/price/time and (optionally) re-point to another order
         if (dto.getOrderId() != null && !dto.getOrderId().equals(history.getOrder().getId())) {
             Order order = orderRepository.findById(dto.getOrderId())
-                    .orElseThrow(() -> new IllegalArgumentException(ORDER_NOT_FOUND));
+                    .orElseThrow(() -> new OrderHistoryException(OrderHistoryExceptionMessages.ORDER_HISTORY_NOT_FOUND));
             history.setOrder(order);
-            try {
-                var userIdField = OrderHistory.class.getDeclaredField("userId");
-                userIdField.setAccessible(true);
-                userIdField.set(history, order.getUserId());
-            } catch (NoSuchFieldException | IllegalAccessException ignored) {}
+//            try {
+//                var userIdField = OrderHistory.class.getDeclaredField("userId");
+//                userIdField.setAccessible(true);
+//                userIdField.set(history, order.getUserId());
+//            } catch (Exception e) {
+//                throw new OrderHistoryException(OrderHistoryExceptionMessages.FAILED_TO_CREATE_ORDER_HISTROY);
+//            }
         }
 
         if (dto.getStatus() != null) history.setStatus(dto.getStatus());
         if (dto.getTotalPrice() != null) history.setTotalPrice(dto.getTotalPrice());
         history.setChangedAt(dto.getChangedAt() != null ? dto.getChangedAt() : LocalDateTime.now());
 
-        OrderHistory saved = orderHistoryRepository.save(history);
+        OrderHistory saved;
+        try {
+            saved = orderHistoryRepository.save(history);
+        } catch (Exception e) {
+            throw new OrderHistoryException(OrderHistoryExceptionMessages.FAILED_TO_UPDATE);
+        }
         return mapToDTO(saved);
     }
 
     public void delete(Long id) {
         if (!orderHistoryRepository.existsById(id)) {
-            throw new IllegalArgumentException(ORDER_HISTORY_NOT_FOUND);
+            throw new OrderHistoryException(OrderHistoryExceptionMessages.ORDER_HISTORY_NOT_FOUND);
         }
         orderHistoryRepository.deleteById(id);
     }
@@ -102,5 +114,12 @@ public class OrderHistoryService {
         dto.setTotalPrice(history.getTotalPrice());
         dto.setChangedAt(history.getChangedAt());
         return dto;
+    }
+
+    public List<OrderHistoryDTO> getAllOrderHistories(Long userId) {
+    return orderHistoryRepository.findAllByUserId(userId)
+            .stream()
+            .map(this::mapToDTO)
+            .collect(Collectors.toList());
     }
 }

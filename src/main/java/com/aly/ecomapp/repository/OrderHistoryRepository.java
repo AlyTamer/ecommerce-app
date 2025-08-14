@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface OrderHistoryRepository extends JpaRepository<OrderHistory, Long> {
     List<OrderHistory> findByOrderId(Long orderId);
+    List<OrderHistory> findAllByUserId(Long userId);
 }
