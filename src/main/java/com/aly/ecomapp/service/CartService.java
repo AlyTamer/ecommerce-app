@@ -1,12 +1,11 @@
 package com.aly.ecomapp.service;
 
 
+import com.aly.ecomapp.entity.*;
 import com.aly.ecomapp.exception.*;
-import com.aly.ecomapp.repository.CartRepository;
+import com.aly.ecomapp.repository.*;
 import com.aly.ecomapp.dto.CartDTO;
 import com.aly.ecomapp.dto.CartItemDTO;
-import com.aly.ecomapp.entity.Cart;
-import com.aly.ecomapp.entity.CartItem;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +22,41 @@ import java.util.stream.Collectors;
 public class CartService {
 
 
-    private CartRepository cartRepository;
+    private final CartRepository cartRepository;
+    private final AppUserRepository appUserRepository;
+    private final ProductRepository productRepository;
+    private final OrderRepository orderRepository;
+    private final OrderHistoryRepository orderHistoryRepository;
+    private final CartItemRepository cartItemRepository;
     private static final int MAX_ITEMS = 10;
 
+
     @Autowired
-    public CartService(CartRepository cartRepository) {
+    public CartService(CartRepository cartRepository,
+                       AppUserRepository appUserRepository,
+                       ProductRepository productRepository,
+                       OrderRepository orderRepository,
+                       OrderHistoryRepository orderHistoryRepository,
+                       CartItemRepository cartItemRepository) {
         this.cartRepository = cartRepository;
+        this.appUserRepository = appUserRepository;
+        this.productRepository = productRepository;
+        this.orderRepository = orderRepository;
+        this.orderHistoryRepository = orderHistoryRepository;
+        this.cartItemRepository = cartItemRepository;
+
     }
 
 
-    public BigDecimal calculateTotal(List<CartItem> items) {
-        if (items == null) return BigDecimal.ZERO;
-        return items.stream()
-                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+    public double calculateTotal(List<CartItem> items) {
+        double total = 0.0;
+        for( CartItem item : items){
+            Product prod = productRepository.findById(item.getProductId())
+                    .orElseThrow( ()-> new ProductException(ProductExceptionMessages.PRODUCT_NOT_FOUND));
+            total+=prod.getPrice()* item.getQuantity();
+        }
+        return total;
     }
 
 
@@ -46,18 +66,19 @@ public class CartService {
         }
         List<CartItemDTO> itemDTOs = cart.getItems().stream()
                 .map(item -> new CartItemDTO(
-                        item.getId(),
                         item.getProductId(),
-                        item.getQuantity(),
-                        item.getPrice()))
+                        item.getQuantity()))
                 .collect(Collectors.toList());
-        BigDecimal total = calculateTotal(cart.getItems());
+        double total = calculateTotal(cart.getItems());
         return new CartDTO(cart.getId(), cart.getUserId(), itemDTOs, total);
     }
 
     public CartDTO createCartForUser(Long userId) {
         if (userId == null) {
             throw new UserException(UserExceptionMessages.NULL_USER_ID);
+        }
+        if(!appUserRepository.existsById(userId)) {
+            throw new UserException(UserExceptionMessages.USER_NOT_FOUND);
         }
         if (cartRepository.findByUserId(userId) != null) {
             throw new CartException(CartExceptionMessages.USER_ALREADY_HAS_CART);
@@ -110,13 +131,14 @@ public class CartService {
             CartItem cartItem = new CartItem();
             cartItem.setProductId(dto.getProductId());
             cartItem.setQuantity(dto.getQuantity());
-            cartItem.setPrice(dto.getPrice());
+            cartItemRepository.save(cartItem);
             items.add(cartItem);
         }
 
         cart.getItems().clear();
         cart.getItems().addAll(items);
         Cart updated;
+
         try {
             updated = cartRepository.save(cart);
         } catch (Exception e) {
@@ -132,7 +154,23 @@ public class CartService {
         if (cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new CartException(CartExceptionMessages.EMPTY_CART);
         }
-
+        Order order = new Order();
+        order.setUserId(cart.getUserId());
+        order.setTotalPrice(BigDecimal.valueOf(calculateTotal(cart.getItems())));
+        order.setStatus(OrderStatus.CREATED);
+        order.setHistory(new ArrayList<>());
+        try {
+            order = orderRepository.save(order);
+        } catch (Exception e) {
+            throw new OrderException(OrderExceptionMessages.ORDER_CREATION_FAILED);
+        }
+        OrderHistory history = new OrderHistory();
+        history.setOrder(order);
+        history.setStatus(OrderStatus.CREATED);
+        history.setTotalPrice(BigDecimal.valueOf(calculateTotal(cart.getItems())));
+        history.setUserId(cart.getUserId());
+        history.setChangedAt(order.getCreatedAt());
+        orderHistoryRepository.save(history);
         return toDTO(cart);
     }
 
@@ -158,7 +196,7 @@ public class CartService {
             throw new CartException(CartExceptionMessages.FAILED_TO_DELETE_CART,e);
         }
     }
+
+
 }
-
-
 

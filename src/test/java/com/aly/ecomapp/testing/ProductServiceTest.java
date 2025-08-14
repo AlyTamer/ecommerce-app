@@ -1,5 +1,6 @@
 package com.aly.ecomapp.testing;
 import com.aly.ecomapp.dto.ProductDto;
+import com.aly.ecomapp.dto.ProductRequestDto;
 import com.aly.ecomapp.repository.CategoryRepository;
 import com.aly.ecomapp.repository.ProductRepository;
 import com.aly.ecomapp.service.ProductService;
@@ -51,11 +52,12 @@ class ProductServiceTest {
 
     @Test
     void createProduct_ValidData_ReturnsSavedDTO() {
-        ProductDto dto = new ProductDto();
+        ProductRequestDto dto = new ProductRequestDto();
         dto.setName("Phone");
         dto.setPrice(500.0);
         dto.setQuantity(10);
         dto.setRating(4.3);
+        dto.setStatus("ACTIVE");
         dto.setCategoryId(1L);
 
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(electronics));
@@ -75,13 +77,13 @@ class ProductServiceTest {
     @Test
     void updateProduct_ChangesData() {
         Product existing = new Product(1L, "Old", 200.0, 1, 3.5, electronics, ProductStatus.ACTIVE);
-        ProductDto update = new ProductDto();
-        update.setName("Updated");
-        update.setPrice(999.0);
-        update.setQuantity(20);
-        update.setRating(4.9);
-        update.setStatus(ProductStatus.OUT_OF_STOCK);
-        update.setCategoryId(1L);
+        ProductRequestDto updateDto = new ProductRequestDto();
+        updateDto.setName("Updated");
+        updateDto.setPrice(999.0);
+        updateDto.setQuantity(20);
+        updateDto.setRating(4.9);
+        updateDto.setStatus("OUT_OF_STOCK");
+        updateDto.setCategoryId(1L);
         Category category = new Category(1L, "Electronics", "Tech");
 
 
@@ -89,10 +91,10 @@ class ProductServiceTest {
         when(categoryRepository.findById(1L)).thenReturn(Optional.of(category));
         when(productRepository.save(any(Product.class))).thenReturn(existing);
 
-        ProductDto result = productService.updateProduct(1L, update);
+        ProductDto result = productService.updateProduct(1L, updateDto);
 
         assertEquals("Updated", result.getName());
-        assertEquals(ProductStatus.OUT_OF_STOCK, update.getStatus());
+        assertEquals("OUT_OF_STOCK", result.getStatus());
     }
 
     @Test
@@ -113,8 +115,8 @@ class ProductServiceTest {
         });
 
         ProductDto result = productService.updateProductStatus(1L, ProductStatus.DISCONTINUED);
-
-        assertEquals(ProductStatus.DISCONTINUED, result.getStatus());
+        assertNotNull(result.getStatus());
+        assertEquals("DISCONTINUED", result.getStatus());
     }
     @Test
     void searchProducts_ReturnsMatching() {

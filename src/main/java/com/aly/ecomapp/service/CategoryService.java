@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.aly.ecomapp.dto.CategoryDto;
+import com.aly.ecomapp.dto.CategoryRequestDto;
 import com.aly.ecomapp.entity.Category;
 import com.aly.ecomapp.repository.CategoryRepository;
 import com.aly.ecomapp.repository.ProductRepository;
@@ -42,19 +43,25 @@ public class CategoryService {
 
     public CategoryDto getCategoryById(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND + id));
+                .orElseThrow(() -> new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND));
         return convertToDto(category);
     }
 
     @Transactional
-    public CategoryDto createCategory(CategoryDto categoryDto) {
-        if (categoryRepository.existsByName(categoryDto.getName())) {
-            throw new CategoryException(CategoryExceptionMessages.CATEGORY_NAME_EXISTS + categoryDto.getName());
+    public CategoryDto createCategory(CategoryRequestDto createDto) {
+        if (categoryRepository.existsByName(createDto.getName())) {
+            throw new CategoryException(CategoryExceptionMessages.CATEGORY_NAME_EXISTS );
         }
 
         Category category = new Category();
-        category.setName(categoryDto.getName());
-        category.setDescription(categoryDto.getDescription());
+        if(createDto.getDescription() == null) {
+            throw new CategoryException(CategoryExceptionMessages.MISSING_PARAMETERS);
+        }
+        if(createDto.getName() == null) {
+            throw new CategoryException(CategoryExceptionMessages.MISSING_PARAMETERS);
+        }
+        category.setName(createDto.getName());
+        category.setDescription(createDto.getDescription());
 
         Category savedCategory;
         try {
@@ -66,17 +73,27 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDto updateCategory(Long id, CategoryDto categoryDto) {
-        Category existingCategory = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND + id));
+    public CategoryDto updateCategory(Long id, CategoryRequestDto updateDto) {
 
-        if (!existingCategory.getName().equals(categoryDto.getName()) &&
-                categoryRepository.existsByName(categoryDto.getName())) {
-            throw new CategoryException(CategoryExceptionMessages.CATEGORY_NAME_EXISTS + categoryDto.getName());
+        if(updateDto.getDescription() == null) {
+            throw new CategoryException(CategoryExceptionMessages.MISSING_PARAMETERS);
+        }
+        if(updateDto.getName() == null) {
+            throw new CategoryException(CategoryExceptionMessages.MISSING_PARAMETERS);
         }
 
-        existingCategory.setName(categoryDto.getName());
-        existingCategory.setDescription(categoryDto.getDescription());
+
+
+        Category existingCategory = categoryRepository.findById(id)
+                .orElseThrow(() -> new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND ));
+
+        if (!existingCategory.getName().equals(updateDto.getName()) &&
+                categoryRepository.existsByName(updateDto.getName())) {
+            throw new CategoryException(CategoryExceptionMessages.CATEGORY_NAME_EXISTS);
+        }
+
+        existingCategory.setName(updateDto.getName());
+        existingCategory.setDescription(updateDto.getDescription());
 
         Category updatedCategory;
         try {
@@ -90,7 +107,7 @@ public class CategoryService {
     @Transactional
     public void deleteCategory(Long id) {
         Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND + id));
+                .orElseThrow(() -> new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND ));
 
         if (productRepository.existsByCategory(category)) {
             throw new ProductException(ProductExceptionMessages.CANNOT_DELETE_DUE_TO_EXISTING_PRODUCT);

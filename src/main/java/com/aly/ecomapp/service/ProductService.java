@@ -1,19 +1,19 @@
 package com.aly.ecomapp.service;
 
-import com.aly.ecomapp.dto.CategoryDto;
 import com.aly.ecomapp.dto.ProductDto;
+import com.aly.ecomapp.dto.ProductRequestDto;
 import com.aly.ecomapp.entity.Category;
 import com.aly.ecomapp.entity.Product;
 import com.aly.ecomapp.entity.ProductStatus;
 import com.aly.ecomapp.exception.CategoryException;
 import com.aly.ecomapp.exception.CategoryExceptionMessages;
-import com.aly.ecomapp.exception.ProductException;
-import com.aly.ecomapp.exception.ProductExceptionMessages;
 import com.aly.ecomapp.repository.CategoryRepository;
 import com.aly.ecomapp.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.aly.ecomapp.exception.ProductException;
+import com.aly.ecomapp.exception.ProductExceptionMessages;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,50 +44,111 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductDto createProduct(ProductDto productDto) {
-        if (productDto.getCategory() == null || productDto.getCategory().getId() == null) {
-            throw new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND);
+    public ProductDto createProduct(ProductRequestDto createDto) {
+        if (createDto.getName() == null ) {
+            throw new ProductException(ProductExceptionMessages.MISSING_PARAMETERS );
         }
-        Category category = categoryRepository.findById(productDto.getCategory().getId())
+        if (createDto.getPrice() == null || createDto.getPrice() <= 0) {
+            throw new ProductException(ProductExceptionMessages.MISSING_PARAMETERS );
+        }
+        if (createDto.getQuantity() == null || createDto.getQuantity() < 0) {
+            throw new ProductException(ProductExceptionMessages.MISSING_PARAMETERS );
+        }
+        if (createDto.getCategoryId() == null) {
+            throw new ProductException(ProductExceptionMessages.MISSING_PARAMETERS );
+        }
+        if (createDto.getRating() == null) {
+            throw new ProductException(ProductExceptionMessages.MISSING_PARAMETERS );
+        }
+        if (createDto.getStatus() == null) {
+            throw new ProductException(ProductExceptionMessages.MISSING_PARAMETERS );
+        }
+
+
+        Category category = categoryRepository.findById(createDto.getCategoryId())
                 .orElseThrow(() -> new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND));
 
         Product product = new Product();
-        product.setTitle(productDto.getTitle());
-        product.setSlug(productDto.getSlug());
-        product.setDescription(productDto.getDescription());
-        product.setPrice(productDto.getPrice());
-        product.setQuantity(productDto.getQuantity());
-        product.setRating(productDto.getRating());
-        product.setStatus(productDto.getStatus() != null ? productDto.getStatus() : ProductStatus.ACTIVE);
+        product.setName(createDto.getName());
+        product.setPrice(createDto.getPrice());
+        product.setQuantity(createDto.getQuantity());
+        product.setRating(createDto.getRating());
+        switch (createDto.getStatus().toUpperCase()) {
+            case "INACTIVE":
+                product.setStatus(ProductStatus.INACTIVE);
+                break;
+            case "OUT_OF_STOCK":
+                product.setStatus(ProductStatus.OUT_OF_STOCK);
+                break;
+            case "DISCONTINUED":
+                product.setStatus(ProductStatus.DISCONTINUED);
+                break;
+            default:
+                product.setStatus(ProductStatus.ACTIVE);
+                break;
+        }
         product.setCategory(category);
-        product.setImages(productDto.getImages());
 
-        return convertToDto(productRepository.save(product));
+        Product savedProduct;
+        try {
+            savedProduct = productRepository.save(product);
+        } catch (Exception e) {
+            throw new ProductException(ProductExceptionMessages.FAILED_TO_CREATE_PRODUCT, e);
+        }
+        return convertToDto(savedProduct);
     }
 
-
     @Transactional
-    public ProductDto updateProduct(Long id, ProductDto productDto) {
-        Product existing = productRepository.findById(id)
+    public ProductDto updateProduct(Long id, ProductRequestDto updateDto) {
+
+        if (updateDto.getName() == null ) {
+            throw new ProductException(ProductExceptionMessages.MISSING_PARAMETERS );
+        }
+        if (updateDto.getPrice() == null || updateDto.getPrice() <= 0) {
+            throw new ProductException(ProductExceptionMessages.MISSING_PARAMETERS );
+        }
+        if (updateDto.getQuantity() == null || updateDto.getQuantity() < 0) {
+            throw new ProductException(ProductExceptionMessages.MISSING_PARAMETERS );
+        }
+        if (updateDto.getCategoryId() == null) {
+            throw new ProductException(ProductExceptionMessages.MISSING_PARAMETERS );
+        }
+        if (updateDto.getRating() == null) {
+            throw new ProductException(ProductExceptionMessages.MISSING_PARAMETERS );
+        }
+        if (updateDto.getStatus() == null) {
+            throw new ProductException(ProductExceptionMessages.MISSING_PARAMETERS );
+        }
+
+
+        Product existingProduct = productRepository.findById(id)
                 .orElseThrow(() -> new ProductException(ProductExceptionMessages.PRODUCT_NOT_FOUND));
 
-        if (productDto.getCategory() == null || productDto.getCategory().getId() == null) {
-            throw new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND);
-        }
-        Category category = categoryRepository.findById(productDto.getCategory().getId())
+        Category category = categoryRepository.findById(updateDto.getCategoryId())
                 .orElseThrow(() -> new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND));
 
-        existing.setTitle(productDto.getTitle());
-        existing.setSlug(productDto.getSlug());
-        existing.setDescription(productDto.getDescription());
-        existing.setPrice(productDto.getPrice());
-        existing.setQuantity(productDto.getQuantity());
-        existing.setRating(productDto.getRating());
-        existing.setStatus(productDto.getStatus());
-        existing.setCategory(category);
-        existing.setImages(productDto.getImages());
+        existingProduct.setName(updateDto.getName());
+        existingProduct.setPrice(updateDto.getPrice());
+        existingProduct.setQuantity(updateDto.getQuantity());
+        existingProduct.setRating(updateDto.getRating());
+        switch (updateDto.getStatus().toUpperCase()) {
+            case "INACTIVE":
+                existingProduct.setStatus(ProductStatus.INACTIVE);
+                break;
+            case "OUT_OF_STOCK":
+                existingProduct.setStatus(ProductStatus.OUT_OF_STOCK);
+                break;
+            case "DISCONTINUED":
+                existingProduct.setStatus(ProductStatus.DISCONTINUED);
+                break;
+            default:
+                existingProduct.setStatus(ProductStatus.ACTIVE);
+                break;
+        }
+        existingProduct.setCategory(category);
 
-        return convertToDto(productRepository.save(existing));
+        Product updatedProduct = productRepository.save(existingProduct);
+        return convertToDto(updatedProduct);
     }
 
     @Transactional
@@ -95,7 +156,7 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductException(ProductExceptionMessages.PRODUCT_NOT_FOUND));
         product.setStatus(ProductStatus.INACTIVE);
-        productRepository.save(product);
+        productRepository.delete(product);
     }
 
     public List<ProductDto> getProductsByCategory(Long categoryId) {
@@ -108,7 +169,7 @@ public class ProductService {
     }
 
     public List<ProductDto> searchProducts(String query) {
-        return productRepository.findByTitleContainingIgnoreCase(query).stream()
+        return productRepository.findByNameContainingIgnoreCase(query).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
@@ -121,32 +182,33 @@ public class ProductService {
         return convertToDto(productRepository.save(product));
     }
 
-    private ProductDto convertToDto(Product p) {
+    private ProductDto convertToDto(Product product) {
         ProductDto dto = new ProductDto();
-        dto.setId(p.getId());
-        dto.setTitle(p.getTitle());
-        dto.setSlug(p.getSlug());
-        dto.setPrice(p.getPrice());
-        dto.setDescription(p.getDescription());
-        dto.setQuantity(p.getQuantity());
-        dto.setRating(p.getRating());
-        dto.setStatus(p.getStatus());
-        dto.setImages(p.getImages()); // already a List<String> in entity
-
-        if (p.getCategory() != null) {
-            CategoryDto catDto = new CategoryDto();
-            catDto.setId(p.getCategory().getId());
-            catDto.setName(p.getCategory().getName());
-            catDto.setDescription(p.getCategory().getDescription());
-            dto.setCategory(catDto);
+        dto.setId(product.getId());
+        dto.setName(product.getName());
+        dto.setPrice(product.getPrice());
+        dto.setQuantity(product.getQuantity());
+        dto.setRating(product.getRating());
+        if (product.getStatus() != null) {
+            switch (product.getStatus().toString().toUpperCase()) {
+                case "INACTIVE":
+                    dto.setStatus(ProductStatus.INACTIVE.toString());
+                    break;
+                case "OUT_OF_STOCK":
+                    dto.setStatus(ProductStatus.OUT_OF_STOCK.toString());
+                    break;
+                case "DISCONTINUED":
+                    dto.setStatus(ProductStatus.DISCONTINUED.toString());
+                    break;
+                default:
+                    dto.setStatus(ProductStatus.ACTIVE.toString());
+            }
+        } else {
+            dto.setStatus(ProductStatus.ACTIVE.toString()); // Default value
         }
-        return dto;
-    }
 
-    public List<ProductDto> getAllFilteredProducts(String title, Integer catId, Integer priceMin, Integer priceMax) {
-        List<Product> product = productRepository.findAllByCondition(title, catId, priceMin, priceMax);
-        return product.stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+        dto.setCategoryId(product.getCategory().getId());
+        dto.setCategoryName(product.getCategory().getName());
+        return dto;
     }
 }

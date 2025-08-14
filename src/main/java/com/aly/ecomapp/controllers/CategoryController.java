@@ -1,5 +1,6 @@
 package com.aly.ecomapp.controllers;
 import com.aly.ecomapp.dto.CategoryDto;
+import com.aly.ecomapp.dto.CategoryRequestDto;
 import com.aly.ecomapp.security.AllowedUser;
 import com.aly.ecomapp.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,8 +50,8 @@ public class CategoryController {
         description = "Create a new product category.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryDto categoryDTO) {
-        CategoryDto createdCategory = categoryService.createCategory(categoryDTO);
+    public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryRequestDto createDto) {
+        CategoryDto createdCategory = categoryService.createCategory(createDto);
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
 
@@ -63,8 +64,8 @@ public class CategoryController {
     )
     public ResponseEntity<CategoryDto> updateCategory(
             @PathVariable Long id,
-            @RequestBody CategoryDto categoryDTO) {
-        return ResponseEntity.ok(categoryService.updateCategory(id, categoryDTO));
+            @RequestBody CategoryRequestDto updateDto) {
+        return ResponseEntity.ok(categoryService.updateCategory(id, updateDto));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
