@@ -1,6 +1,7 @@
 package com.aly.ecomapp.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import java.math.BigDecimal;
@@ -11,14 +12,14 @@ public class CartItemDTO {
     private Long id;
     private Long productId;
     private int quantity;
-    private BigDecimal price;
+    //private BigDecimal price;
+
 
     public CartItemDTO() {}
 
-    public CartItemDTO(Long id, Long productId, int quantity, BigDecimal price) {
+    public CartItemDTO(Long id, Long productId, int quantity) {
         this.id = id;
         this.productId = productId;
         this.quantity = quantity;
-        this.price = price;
     }
 }
