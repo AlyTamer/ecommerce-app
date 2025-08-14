@@ -4,6 +4,10 @@ import com.aly.ecomapp.dto.OrderDTO;
 import com.aly.ecomapp.entity.Order;
 import com.aly.ecomapp.entity.OrderHistory;
 import com.aly.ecomapp.entity.OrderStatus;
+import com.aly.ecomapp.exception.OrderException;
+import com.aly.ecomapp.exception.OrderExceptionMessages;
+import com.aly.ecomapp.exception.OrderHistoryException;
+import com.aly.ecomapp.exception.OrderHistoryExceptionMessages;
 import com.aly.ecomapp.repository.OrderHistoryRepository;
 import com.aly.ecomapp.repository.OrderRepository;
 import org.springframework.stereotype.Service;
@@ -16,8 +20,6 @@ import java.util.stream.Collectors;
 @Service
 public class OrderService {
 
-    private static final String ORDER_NOT_FOUND = "Order not found";
-
     private final OrderRepository orderRepository;
     private final OrderHistoryRepository orderHistoryRepository;
 
@@ -27,12 +29,9 @@ public class OrderService {
         this.orderHistoryRepository = orderHistoryRepository;
     }
 
-    // ---------- CRUD using DTOs ----------
-
     @Transactional
     public OrderDTO create(OrderDTO dto) {
         Order toSave = mapToEntity(dto);
-        // ensure timestamps & default status
         if (toSave.getCreatedAt() == null) {
             toSave.setCreatedAt(LocalDateTime.now());
         }
@@ -41,25 +40,25 @@ public class OrderService {
             toSave.setStatus(OrderStatus.CREATED);
         }
 
-        Order saved = orderRepository.save(toSave);
+        Order saved;
+        try {
+            saved = orderRepository.save(toSave);
+        } catch (Exception e) {
+            throw new OrderException(OrderExceptionMessages.ORDER_CREATION_FAILED);
+        }
 
-        // create a history snapshot automatically
         OrderHistory snap = new OrderHistory();
         snap.setOrder(saved);
         snap.setStatus(saved.getStatus());
         snap.setTotalPrice(saved.getTotalPrice());
         snap.setChangedAt(LocalDateTime.now());
-        // if your OrderHistory has userId column, set it here:
-        try {
-            // reflect userId if the entity has it
-            var userIdField = OrderHistory.class.getDeclaredField("userId");
-            userIdField.setAccessible(true);
-            userIdField.set(snap, saved.getUserId());
-        } catch (NoSuchFieldException | IllegalAccessException ignored) {
-            // ignore if OrderHistory does not have userId
-        }
 
-        orderHistoryRepository.save(snap);
+
+        try {
+            orderHistoryRepository.save(snap);
+        } catch (Exception e) {
+            throw new OrderException(OrderExceptionMessages.ORDER_HISTORY_CREATION_FAILED);
+        }
 
         return mapToDTO(saved);
     }
@@ -67,29 +66,33 @@ public class OrderService {
     @Transactional
     public OrderDTO update(Long id, OrderDTO dto) {
         Order existing = orderRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException(ORDER_NOT_FOUND));
+                .orElseThrow(() -> new OrderException(OrderExceptionMessages.ORDER_NOT_FOUND));
 
-        // Update allowed fields
         if (dto.getStatus() != null) existing.setStatus(dto.getStatus());
         if (dto.getTotalPrice() != null) existing.setTotalPrice(dto.getTotalPrice());
         if (dto.getUserId() != null) existing.setUserId(dto.getUserId());
         existing.setUpdatedAt(LocalDateTime.now());
 
-        Order saved = orderRepository.save(existing);
+        Order saved;
+        try {
+            saved = orderRepository.save(existing);
+        } catch (Exception e) {
+            throw new OrderException(OrderExceptionMessages.ORDER_UPDATE_FAILED);
+        }
 
-        // append a history entry for the update
         OrderHistory snap = new OrderHistory();
         snap.setOrder(saved);
         snap.setStatus(saved.getStatus());
         snap.setTotalPrice(saved.getTotalPrice());
         snap.setChangedAt(LocalDateTime.now());
-        try {
-            var userIdField = OrderHistory.class.getDeclaredField("userId");
-            userIdField.setAccessible(true);
-            userIdField.set(snap, saved.getUserId());
-        } catch (NoSuchFieldException | IllegalAccessException ignored) {}
 
-        orderHistoryRepository.save(snap);
+
+
+        try {
+            orderHistoryRepository.save(snap);
+        } catch (Exception e) {
+            throw new OrderHistoryException(OrderHistoryExceptionMessages.FAILED_TO_CREATE_ORDER_HISTROY);
+        }
 
         return mapToDTO(saved);
     }
@@ -97,7 +100,7 @@ public class OrderService {
     public OrderDTO getById(Long id) {
         return orderRepository.findById(id)
                 .map(this::mapToDTO)
-                .orElse(null);
+                .orElseThrow(()-> new OrderException(OrderExceptionMessages.ORDER_NOT_FOUND));
     }
 
     public List<OrderDTO> getAll() {
@@ -109,13 +112,15 @@ public class OrderService {
 
     public void delete(Long id) {
         if (!orderRepository.existsById(id)) {
-            throw new IllegalArgumentException(ORDER_NOT_FOUND);
+            throw new OrderException(OrderExceptionMessages.ORDER_NOT_FOUND);
         }
-        orderRepository.deleteById(id);
-        // (Optional) keep history; if you want to delete, add repository call here.
+        try {
+            orderRepository.deleteById(id);
+        } catch (Exception e) {
+            throw new OrderException(OrderExceptionMessages.ORDER_DELETION_FAILED);
+        }
     }
 
-    // ---------- Mapping helpers ----------
 
     private OrderDTO mapToDTO(Order order) {
         OrderDTO dto = new OrderDTO();
@@ -130,12 +135,18 @@ public class OrderService {
 
     private Order mapToEntity(OrderDTO dto) {
         Order order = new Order();
-        // id is generated; ignore dto.id on create
         order.setUserId(dto.getUserId());
         order.setStatus(dto.getStatus());
         order.setTotalPrice(dto.getTotalPrice());
         order.setCreatedAt(dto.getCreatedAt());
         order.setUpdatedAt(dto.getUpdatedAt());
         return order;
+    }
+
+    public List<OrderDTO> getAllOrdersByUserId(Long userId) {
+        return orderRepository.findAllByUserId(userId)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 }
