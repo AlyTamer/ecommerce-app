@@ -26,11 +26,7 @@ public class Cart {
     @JoinColumn(name = "cart_id")
     private List<CartItem> items = new ArrayList<>();
 
-    public BigDecimal getTotal() {
-        return items.stream()
-                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
+
 
 
 

@@ -20,8 +20,8 @@ public class CartItem {
     private Long productId;
     private int quantity;
 
-    @Column(name = "price", nullable = false)
-    private BigDecimal price;
+    //@Column(name = "price", nullable = false)
+    //private BigDecimal price;
 
 
 
