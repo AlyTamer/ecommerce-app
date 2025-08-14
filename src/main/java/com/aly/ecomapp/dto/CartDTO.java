@@ -13,11 +13,11 @@ public class CartDTO {
     private Long id;
     private Long userId;
     private List<CartItemDTO> items;
-    private BigDecimal total;
+    private double total;
 
     public CartDTO() {}
 
-    public CartDTO(Long id, Long userId, List<CartItemDTO> items, BigDecimal total) {
+    public CartDTO(Long id, Long userId, List<CartItemDTO> items, double total) {
         this.id = id;
         this.userId = userId;
         this.items = items;
