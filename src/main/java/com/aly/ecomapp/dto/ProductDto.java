@@ -1,6 +1,8 @@
 package com.aly.ecomapp.dto;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class ProductDto {
     private Long id;
@@ -12,5 +14,6 @@ public class ProductDto {
     private Long categoryId;
     private String categoryName;
     private String description;
+    private List<String> images;
 
 }

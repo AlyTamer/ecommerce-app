@@ -210,6 +210,7 @@ public class ProductService {
         dto.setCategoryId(product.getCategory().getId());
         dto.setCategoryName(product.getCategory().getName());
         dto.setDescription(product.getDescription());
+        dto.setImages(product.getImages());
         return dto;
     }
 
