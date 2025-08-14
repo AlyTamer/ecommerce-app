@@ -131,16 +131,9 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Swagger/OpenAPI
                         .requestMatchers(
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/v3/api-docs",
-                                "/v3/api-docs.yaml",
-                                "/swagger-resources/**",
-                                "/webjars/**"
+                                "/",
+                                "/**"
                         ).permitAll()
-                        .requestMatchers("/api/v1/auth/register", "/api/v1/auth/login").permitAll()
-
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
