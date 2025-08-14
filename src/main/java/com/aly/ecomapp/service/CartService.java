@@ -1,15 +1,11 @@
 package com.aly.ecomapp.service;
 
 
-import com.aly.ecomapp.entity.Product;
+import com.aly.ecomapp.entity.*;
 import com.aly.ecomapp.exception.*;
-import com.aly.ecomapp.repository.AppUserRepository;
-import com.aly.ecomapp.repository.CartRepository;
+import com.aly.ecomapp.repository.*;
 import com.aly.ecomapp.dto.CartDTO;
 import com.aly.ecomapp.dto.CartItemDTO;
-import com.aly.ecomapp.entity.Cart;
-import com.aly.ecomapp.entity.CartItem;
-import com.aly.ecomapp.repository.ProductRepository;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,18 +24,27 @@ public class CartService {
 
     private final CartRepository cartRepository;
     private final AppUserRepository appUserRepository;
-
+    private final ProductRepository productRepository;
+    private final OrderRepository orderRepository;
+    private final OrderHistoryRepository orderHistoryRepository;
+    private final CartItemRepository cartItemRepository;
     private static final int MAX_ITEMS = 10;
 
-    private final ProductRepository productRepository;
 
     @Autowired
     public CartService(CartRepository cartRepository,
                        AppUserRepository appUserRepository,
-                       ProductRepository productRepository) {
+                       ProductRepository productRepository,
+                       OrderRepository orderRepository,
+                       OrderHistoryRepository orderHistoryRepository,
+                       CartItemRepository cartItemRepository) {
         this.cartRepository = cartRepository;
         this.appUserRepository = appUserRepository;
         this.productRepository = productRepository;
+        this.orderRepository = orderRepository;
+        this.orderHistoryRepository = orderHistoryRepository;
+        this.cartItemRepository = cartItemRepository;
+
     }
 
 
@@ -49,7 +54,7 @@ public class CartService {
         for( CartItem item : items){
             Product prod = productRepository.findById(item.getProductId())
                     .orElseThrow( ()-> new ProductException(ProductExceptionMessages.PRODUCT_NOT_FOUND));
-            total+=prod.getPrice();
+            total+=prod.getPrice()* item.getQuantity();
         }
         return total;
     }
@@ -61,7 +66,6 @@ public class CartService {
         }
         List<CartItemDTO> itemDTOs = cart.getItems().stream()
                 .map(item -> new CartItemDTO(
-                        item.getId(),
                         item.getProductId(),
                         item.getQuantity()))
                 .collect(Collectors.toList());
@@ -127,12 +131,14 @@ public class CartService {
             CartItem cartItem = new CartItem();
             cartItem.setProductId(dto.getProductId());
             cartItem.setQuantity(dto.getQuantity());
+            cartItemRepository.save(cartItem);
             items.add(cartItem);
         }
 
         cart.getItems().clear();
         cart.getItems().addAll(items);
         Cart updated;
+
         try {
             updated = cartRepository.save(cart);
         } catch (Exception e) {
@@ -148,7 +154,23 @@ public class CartService {
         if (cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new CartException(CartExceptionMessages.EMPTY_CART);
         }
-
+        Order order = new Order();
+        order.setUserId(cart.getUserId());
+        order.setTotalPrice(BigDecimal.valueOf(calculateTotal(cart.getItems())));
+        order.setStatus(OrderStatus.CREATED);
+        order.setHistory(new ArrayList<>());
+        try {
+            order = orderRepository.save(order);
+        } catch (Exception e) {
+            throw new OrderException(OrderExceptionMessages.ORDER_CREATION_FAILED);
+        }
+        OrderHistory history = new OrderHistory();
+        history.setOrder(order);
+        history.setStatus(OrderStatus.CREATED);
+        history.setTotalPrice(BigDecimal.valueOf(calculateTotal(cart.getItems())));
+        history.setUserId(cart.getUserId());
+        history.setChangedAt(order.getCreatedAt());
+        orderHistoryRepository.save(history);
         return toDTO(cart);
     }
 

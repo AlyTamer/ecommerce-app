@@ -9,7 +9,6 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class CartItemDTO {
-    private Long id;
     private Long productId;
     private int quantity;
     //private BigDecimal price;
@@ -17,8 +16,7 @@ public class CartItemDTO {
 
     public CartItemDTO() {}
 
-    public CartItemDTO(Long id, Long productId, int quantity) {
-        this.id = id;
+    public CartItemDTO(  Long productId, int quantity) {
         this.productId = productId;
         this.quantity = quantity;
     }
