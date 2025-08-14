@@ -1,5 +1,6 @@
 package com.aly.ecomapp.controllers;
 import com.aly.ecomapp.dto.ProductDto;
+import com.aly.ecomapp.dto.ProductRequestDto;
 import com.aly.ecomapp.entity.ProductStatus;
 import com.aly.ecomapp.security.AllowedUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,8 +51,8 @@ public class ProductController {
             description = "Create a new product in the system.",
             security = @SecurityRequirement(name="bearerAuth")
     )
-    public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
-        return ResponseEntity.ok(productService.createProduct(productDto));
+    public ResponseEntity<ProductDto> createProduct(@RequestBody ProductRequestDto createDto) {
+        return ResponseEntity.ok(productService.createProduct(createDto));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -63,8 +64,8 @@ public class ProductController {
     )
     public ResponseEntity<ProductDto> updateProduct(
             @PathVariable Long id,
-            @RequestBody ProductDto productDto) {
-        return ResponseEntity.ok(productService.updateProduct(id, productDto));
+            @RequestBody ProductRequestDto createDto) {
+        return ResponseEntity.ok(productService.updateProduct(id, createDto));
     }
 
     @PreAuthorize("hasRole('ADMIN')")
