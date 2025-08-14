@@ -122,9 +122,9 @@ public class ProductController {
     )
     @GetMapping("/filter")
     public ResponseEntity<List<ProductDto>> getAllProductsOnCondition(@RequestParam(required = false) String title,
-                                                                      @RequestParam(required =false) Integer catId ,
-                                                                      @RequestParam(required = false) Integer priceMin,
-                                                                      @RequestParam(required = false) Integer priceMax) {
-        return ResponseEntity.ok(productService.getAllFilteredProducts(title,catId,priceMin,priceMax));
+                                                                      @RequestParam(required =false) Integer categoryId ,
+                                                                      @RequestParam(required = false) Integer price_min,
+                                                                      @RequestParam(required = false) Integer price_max) {
+        return ResponseEntity.ok(productService.getAllFilteredProducts(title,categoryId,price_min,price_max));
     }
 }
