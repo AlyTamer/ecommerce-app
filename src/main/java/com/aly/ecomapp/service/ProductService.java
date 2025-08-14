@@ -69,7 +69,7 @@ public class ProductService {
                 .orElseThrow(() -> new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND));
 
         Product product = new Product();
-        product.setName(createDto.getName());
+        product.setTitle(createDto.getName());
         product.setPrice(createDto.getPrice());
         product.setQuantity(createDto.getQuantity());
         product.setRating(createDto.getRating());
@@ -127,7 +127,7 @@ public class ProductService {
         Category category = categoryRepository.findById(updateDto.getCategoryId())
                 .orElseThrow(() -> new CategoryException(CategoryExceptionMessages.CATEGORY_NOT_FOUND));
 
-        existingProduct.setName(updateDto.getName());
+        existingProduct.setTitle(updateDto.getName());
         existingProduct.setPrice(updateDto.getPrice());
         existingProduct.setQuantity(updateDto.getQuantity());
         existingProduct.setRating(updateDto.getRating());
@@ -169,7 +169,7 @@ public class ProductService {
     }
 
     public List<ProductDto> searchProducts(String query) {
-        return productRepository.findByNameContainingIgnoreCase(query).stream()
+        return productRepository.findByTitleContainingIgnoreCase(query).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
@@ -185,7 +185,7 @@ public class ProductService {
     private ProductDto convertToDto(Product product) {
         ProductDto dto = new ProductDto();
         dto.setId(product.getId());
-        dto.setName(product.getName());
+        dto.setName(product.getTitle());
         dto.setPrice(product.getPrice());
         dto.setQuantity(product.getQuantity());
         dto.setRating(product.getRating());
@@ -210,5 +210,11 @@ public class ProductService {
         dto.setCategoryId(product.getCategory().getId());
         dto.setCategoryName(product.getCategory().getName());
         return dto;
+    }
+
+    public List<ProductDto> getAllFilteredProducts(String title, Integer catId, Integer priceMin, Integer priceMax) {
+    return productRepository.findAllByCondition(title, catId, priceMin, priceMax).stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
     }
 }

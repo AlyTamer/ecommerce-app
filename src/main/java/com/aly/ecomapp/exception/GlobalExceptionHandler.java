@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 
-//Event handler to handle all exceptions for the program
+@SuppressWarnings("all")
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -22,6 +22,10 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+    @ExceptionHandler(CartItemException.class)
+    public ResponseEntity<String> handleCartItemException(CartItemException ex, WebRequest request){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 
     @ExceptionHandler(ProductException.class)
     public ResponseEntity<String> handleProductException(ProductException ex, WebRequest request){
@@ -30,6 +34,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CategoryException.class)
     public ResponseEntity<String> handleCategoryException(CategoryException ex, WebRequest request){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+    @ExceptionHandler(OrderException.class)
+    public ResponseEntity<String> handleOrderException(OrderException ex, WebRequest request){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+    @ExceptionHandler(OrderHistoryException.class)
+    public ResponseEntity<String> handleOrderHistoryException(OrderHistoryException ex, WebRequest request){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+    @ExceptionHandler(AuthException.class)
+    public ResponseEntity<String> handleAuthException(AuthException ex, WebRequest request){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGenericException(Exception ex, WebRequest request){

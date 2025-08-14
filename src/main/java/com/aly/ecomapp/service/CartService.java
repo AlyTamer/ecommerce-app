@@ -154,6 +154,7 @@ public class CartService {
         if (cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new CartException(CartExceptionMessages.EMPTY_CART);
         }
+        Long userId = cart.getUserId();
         Order order = new Order();
         order.setUserId(cart.getUserId());
         order.setTotalPrice(BigDecimal.valueOf(calculateTotal(cart.getItems())));
@@ -168,7 +169,7 @@ public class CartService {
         history.setOrder(order);
         history.setStatus(OrderStatus.CREATED);
         history.setTotalPrice(BigDecimal.valueOf(calculateTotal(cart.getItems())));
-        history.setUserId(cart.getUserId());
+        history.setUserId(userId);
         history.setChangedAt(order.getCreatedAt());
         orderHistoryRepository.save(history);
         return toDTO(cart);

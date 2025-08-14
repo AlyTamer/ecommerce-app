@@ -23,10 +23,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoryAndStatus(Category category, ProductStatus status);
 
     // Search products by name
-    List<Product> findByNameContainingIgnoreCase(String name);
+    List<Product> findByTitleContainingIgnoreCase(String name);
 
     // Search active products by name
-    List<Product> findByNameContainingIgnoreCaseAndStatus(String name, ProductStatus status);
+    List<Product> findByTitleContainingIgnoreCaseAndStatus(String name, ProductStatus status);
 
     // Check if products exist for a category
     boolean existsByCategory(Category category);
@@ -39,4 +39,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Find by ID with status check
     Optional<Product> findByIdAndStatus(Long id, ProductStatus status);
     void deleteById(Long id);
+    @Query("""
+    SELECT p FROM Product p
+    WHERE (:title IS NULL OR LOWER(p.title) LIKE LOWER(CONCAT('%', :title, '%')))
+      AND (:catId IS NULL OR p.category.id = :catId)
+      AND (:priceMin IS NULL OR p.price >= :priceMin)
+      AND (:priceMax IS NULL OR p.price <= :priceMax)
+    """)
+    List<Product> findAllByCondition(String title, Integer catId, Integer priceMin, Integer priceMax);
 }
