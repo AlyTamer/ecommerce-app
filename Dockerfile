@@ -2,7 +2,7 @@ FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
 COPY pom.xml .
-RUN --mount=type=cache,target=/root/.m2 mvn -B -q dependency:go-offline
+RUN mvn -q -DskipTests package
 
 COPY src ./src
 # If your tests don't compile, use the next line; otherwise you can keep -DskipTests
