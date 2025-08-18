@@ -36,6 +36,9 @@ public class CategoryService {
             categoryDTO.setId(c.getId());
             categoryDTO.setName(c.getName());
             categoryDTO.setDescription(c.getDescription());
+            categoryDTO.setSlug(c.getSlug());
+            categoryDTO.setImage(c.getImage());
+
             categories.add(categoryDTO);
         }
         return  categories;
