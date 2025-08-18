@@ -1,4 +1,5 @@
 package com.aly.ecomapp.config;
+
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
@@ -7,22 +8,27 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
 
 @OpenAPIDefinition(
-        info =@Info(
+        info = @Info(
                 title = "Eccommerce Application API",
                 version = "1.0",
                 description = "API documentation for Bright Skies Task to test out the Ecommerce Application"
         ),
 
-        servers ={
+        servers = {
                 @Server(url = "http://localhost:8080"),
-        @Server(
-                url = "http://localhost:8000",
-                description = "docker local server"
-        )}
+                @Server(
+                        url = "http://localhost:8000",
+                        description = "docker local server"
+                ),
+                @Server(
+                        url="https://ecommerce-app-production-e80c.up.railway.app",
+                        description = "Railway Production Server"
+                )
+        }
 
 )
 @SecurityScheme(
-        name="bearerAuth",
+        name = "bearerAuth",
         description = "Basic JWT Authentication based on Username and Password + Admin/User Role",
         scheme = "bearer",
         type = SecuritySchemeType.HTTP,
