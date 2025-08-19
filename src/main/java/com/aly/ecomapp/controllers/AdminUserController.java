@@ -58,11 +58,17 @@ public class AdminUserController {
     )
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody AdminCreateUserRequest req) {
-        Role role = Role.USER;
-        if (req.role() != null && !req.role().isBlank()) {
-            try { role = Role.valueOf(req.role().trim().toUpperCase()); }
-            catch (IllegalArgumentException e) { throw new IllegalArgumentException("role must be ADMIN or USER"); }
+        if (req.role() == null || req.role().isBlank()) {
+            throw new IllegalArgumentException("Role is not provided");
         }
+
+        Role role;
+        try {
+            role = Role.valueOf(req.role().trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("role must be ADMIN or USER");
+        }
+
         var created = authService.register(
                 new RegisterRequest(req.email(), req.password()),
                 role
@@ -70,10 +76,11 @@ public class AdminUserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+
     @Operation(
         summary = "Update user status",
         description = "Updates the status of a user by their ID. " +
-                      "Valid statuses are AVAILABLE, BLOCKED, or DELETED.",
+                      "Valid statuses are AVAILABLE, BLOCKED.",
         security = @SecurityRequirement(name="bearerAuth")
     )
     @PatchMapping("/{id}/status")
