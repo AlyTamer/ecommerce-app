@@ -1,9 +1,6 @@
 package com.aly.ecomapp.service;
 
-import com.aly.ecomapp.dto.AuthResponse;
-import com.aly.ecomapp.dto.LoginRequest;
-import com.aly.ecomapp.dto.RegisterRequest;
-import com.aly.ecomapp.dto.UserResponse;
+import com.aly.ecomapp.dto.*;
 import com.aly.ecomapp.entity.AppUser;
 import com.aly.ecomapp.entity.Role;
 import com.aly.ecomapp.entity.UserStatus;
@@ -13,6 +10,7 @@ import com.aly.ecomapp.exception.UserException;
 import com.aly.ecomapp.exception.UserExceptionMessages;
 import com.aly.ecomapp.repository.AppUserRepository;
 import com.aly.ecomapp.security.JwtUtil;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,5 +65,54 @@ public class AuthService {
                 u.getRole().name(),
                 u.getStatus().name()
         );
+    }
+    private void generateOTP(AppUser u) {
+        String otp = Math.random()* 100000 + "";
+        otp = otp.substring(0, 6);
+        u.setOtp(otp);
+        System.out.println(otp);
+        repo.save(u);
+    }
+
+    public AuthResponse resetPassword(@Valid ResetRequest req) {
+            AppUser user = repo.findByEmail(req.getEmail().toLowerCase())
+                    .orElseThrow(() -> new AuthException(AuthExceptionMessages.INVALID_CREDENTIALS));
+
+            if(user.getStatus()==UserStatus.BLOCKED){
+                throw new UserException(UserExceptionMessages.USER_IS_BLOCKED);
+            }
+        if (user.getOtp()==null) {
+            generateOTP(user);
+        }
+
+        String otp = req.getOtp();
+        if (otp==user.getOtp()) {
+            user.setPasswordHash(passwords.hash(req.getNewPassword()));
+            user.setOtp(null); // Clear OTP after successful reset
+            repo.save(user);
+            String token = jwt.generateToken(user.getEmail(), "ROLE_" + user.getRole().name());
+            return new AuthResponse(token, user.getRole().name());
+        }
+        throw new AuthException(AuthExceptionMessages.INVALID_CREDENTIALS);
+
+    }
+
+    public Object changePassword(@Valid ForgotPasswordRequest req) {
+    AppUser user = repo.findByEmail(req.getEmail().toLowerCase())
+            .orElseThrow(() -> new AuthException(AuthExceptionMessages.INVALID_CREDENTIALS));
+    if (user.getStatus() == UserStatus.BLOCKED) {
+        throw new UserException(UserExceptionMessages.USER_IS_BLOCKED);
+    }
+        if (user.getPasswordHash()==passwords.hash(req.getOldPassword())) {
+            if (user.getPasswordHash()==passwords.hash(req.getNewPassword())) {
+                throw new AuthException(AuthExceptionMessages.PASSWORD_ALREADY_EXISTS);
+            }
+            user.setPasswordHash(passwords.hash(req.getNewPassword()));
+            repo.save(user);
+            String token = jwt.generateToken(user.getEmail(), "ROLE_" + user.getRole().name());
+            return new AuthResponse(token, user.getRole().name());
+        }
+
+throw new AuthException(AuthExceptionMessages.INVALID_CREDENTIALS);
     }
 }

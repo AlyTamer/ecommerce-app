@@ -6,17 +6,19 @@ CREATE TABLE users
     role          VARCHAR(255)                            NOT NULL,
     status        VARCHAR(255)                            NOT NULL,
     created_at    TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
-    CONSTRAINT pk_app_users PRIMARY KEY (id)
+    otp           VARCHAR(255)                                 NOT NULL,
+    CONSTRAINT pk_users PRIMARY KEY (id)
 );
 
 ALTER TABLE users
-    ADD CONSTRAINT uc_27629ccf2080eea417f75bd2b UNIQUE (email);
-
-INSERT INTO users (email, password_hash, role, status, created_at)
+    ADD CONSTRAINT uc_74165e195b2f7b25de690d14a UNIQUE (email);
+INSERT INTO users (email, password_hash, role, status, created_at, otp)
 VALUES (
            'admin@example.com',
            '$2a$10$69u3D/FXOY0loIcG4UI6LO9n5bk9LcxKBRA.WNlfPxG9QIS0tU1XW', -- bcrypt of: admin123
            'ADMIN',
            'AVAILABLE',
-           NOW()
+           NOW(),
+
+        null
        );

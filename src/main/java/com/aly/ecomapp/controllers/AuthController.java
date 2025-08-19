@@ -1,12 +1,8 @@
 package com.aly.ecomapp.controllers;
 
-import com.aly.ecomapp.dto.AuthResponse;
-import com.aly.ecomapp.dto.LoginRequest;
-import com.aly.ecomapp.dto.RegisterRequest;
-import com.aly.ecomapp.dto.UserResponse;
+import com.aly.ecomapp.dto.*;
 import com.aly.ecomapp.entity.Role;
 import com.aly.ecomapp.service.AuthService;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +16,15 @@ public class AuthController {
 
     public AuthController(AuthService auth) {
         this.auth = auth;
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> ResetPassword(@Valid @RequestBody ResetRequest req) {
+        return ResponseEntity.ok(auth.resetPassword(req));
+    }
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> ForgotPassword(@Valid @RequestBody ForgotPasswordRequest req) {
+        return ResponseEntity.ok(auth.changePassword(req));
     }
 
     @PostMapping("/register")
