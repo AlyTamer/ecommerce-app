@@ -137,7 +137,9 @@ public class WebSecurityConfig {
                                 "/v3/api-docs",
                                 "/v3/api-docs.yaml",
                                 "/swagger-resources/**",
-                                "/webjars/**"
+                                "/webjars/**",
+                                "/api/v1/auth/**"
+
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
