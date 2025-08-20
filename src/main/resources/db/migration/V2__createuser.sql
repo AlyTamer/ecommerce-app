@@ -4,8 +4,10 @@ CREATE TABLE users
     email         VARCHAR(255)                            NOT NULL,
     password_hash VARCHAR(255)                            NOT NULL,
     role          VARCHAR(255)                            NOT NULL,
-    status        VARCHAR(255)                            NOT NULL,
+    status        VARCHAR(255)      NOT NULL,
     created_at    TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
+    password_reset_token VARCHAR(255),
+    password_reset_expires TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT pk_app_users PRIMARY KEY (id)
 );
 

@@ -73,7 +73,7 @@ public class AdminUserController {
     @Operation(
         summary = "Update user status",
         description = "Updates the status of a user by their ID. " +
-                      "Valid statuses are AVAILABLE, BLOCKED, or DELETED.",
+                      "Valid statuses are AVAILABLE, BLOCKED.",
         security = @SecurityRequirement(name="bearerAuth")
     )
     @PatchMapping("/{id}/status")
