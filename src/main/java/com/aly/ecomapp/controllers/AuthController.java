@@ -36,41 +36,42 @@ public class AuthController {
         return ResponseEntity.ok(auth.login(req));
     }
 
+
     @PostMapping("/forgot-password")
-    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequestDTO request) {
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequestDTO request) {
         String email = request.getEmail();
         if (email == null || email.isBlank()) {
             return ResponseEntity.badRequest()
                     .body(Map.of("error", "Email is required"));
         }
+
         try {
-            passwordService.sendPasswordResetLink(email);
-            return ResponseEntity.ok(Map.of("message", "Password reset link sent to " + email));
+            passwordService.sendPasswordResetOtp(email);
+            return ResponseEntity.ok(Map.of("message", "OTP sent to " + email));
         } catch (Exception e) {
             return ResponseEntity.badRequest()
                     .body(Map.of("error", e.getMessage()));
         }
     }
 
-    @PostMapping("/reset-password")
-    public ResponseEntity<Map<String, String>> resetPassword(@RequestBody ResetPasswordRequestDTO request) {
-        System.out.println("Incoming reset password request: token=" + request.getToken() + ", newPassword=" + request.getNewPassword());
 
-        if (request.getToken() == null || request.getToken().trim().isEmpty()) {
-            return ResponseEntity.badRequest()
-                    .body(Map.of("error", "Token is required"));
-        }
-        if (request.getNewPassword() == null || request.getNewPassword().length() < 6) {
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequestDTO request) {
+        String email = request.getEmail();
+        String otp = request.getOtp();
+        String newPassword = request.getNewPassword();
+
+        if (newPassword.length() < 6) {
             return ResponseEntity.badRequest()
                     .body(Map.of("error", "Password must be at least 6 characters"));
         }
 
         try {
-            passwordService.resetPassword(request.getToken(), request.getNewPassword());
-            return ResponseEntity.ok(Map.of("message", "Password has been reset successfully"));
+            passwordService.verifyOtpAndResetPassword(email, otp, newPassword);
+            return ResponseEntity.ok(Map.of("message", "Password reset successfully"));
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", e.getMessage()));
         }
     }
 

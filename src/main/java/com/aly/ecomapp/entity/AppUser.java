@@ -41,6 +41,12 @@ public class AppUser {
     @PrePersist
     public void onCreate() { this.createdAt = Instant.now(); }
 
+    @Column(name = "password_reset_otp")
+    private String passwordResetOtp;
+
+    @Column(name = "password_reset_otp_expires")
+    private Instant passwordResetOtpExpires;
+
 //    getters/setters
 //    public Long getId() { return id; }
 //    public void setId(Long id) { this.id = id; }
