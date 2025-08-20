@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/products")
+@AllowedUser
 
 public class ProductController {
 
@@ -52,6 +53,7 @@ public class ProductController {
             description = "Create a new product in the system.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductDto> createProduct(@RequestBody ProductRequestDto createDto) {
         return ResponseEntity.ok(productService.createProduct(createDto));
     }
@@ -63,6 +65,7 @@ public class ProductController {
             description = "Update the details of an existing product.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductDto> updateProduct(
             @PathVariable Long id,
             @RequestBody ProductRequestDto createDto) {
@@ -76,6 +79,7 @@ public class ProductController {
             description = "Delete a product from the system by its ID.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();

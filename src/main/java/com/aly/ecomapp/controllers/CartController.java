@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-
+@AllowedUser
 @RequestMapping("/cart")
 public class CartController {
 
@@ -64,6 +64,7 @@ public class CartController {
                       "This endpoint is accessible only to users with ADMIN role.",
         security = @SecurityRequirement(name = "bearerAuth")
     )
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<CartDTO>> getAllCarts() {
         List<CartDTO> carts = cartService.getAllCarts();
@@ -113,6 +114,7 @@ public class CartController {
             summary ="Deletes entire cart",
             security = @SecurityRequirement(name="bearerAuth")
     )
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCart(@PathVariable Long id) {
         cartService.deleteCart(id);
