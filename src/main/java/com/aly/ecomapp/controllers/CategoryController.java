@@ -14,7 +14,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/categories")
-@AllowedUser
 
 public class CategoryController {
 
@@ -51,7 +50,6 @@ public class CategoryController {
         description = "Create a new product category.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryDto> createCategory(@RequestBody CategoryRequestDto createDto) {
         CategoryDto createdCategory = categoryService.createCategory(createDto);
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
@@ -64,7 +62,6 @@ public class CategoryController {
         description = "Update the details of an existing product category.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CategoryDto> updateCategory(
             @PathVariable Long id,
             @RequestBody CategoryRequestDto updateDto) {
@@ -78,7 +75,6 @@ public class CategoryController {
         description = "Delete a product category by its ID.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
