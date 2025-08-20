@@ -46,5 +46,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
       AND (:priceMin IS NULL OR p.price >= :priceMin)
       AND (:priceMax IS NULL OR p.price <= :priceMax)
     """)
-    List<Product> findAllByCondition(String title, Integer catId, Integer priceMin, Integer priceMax);
+    List<Product> findAllByCondition(String title, Long catId, Double priceMin, Double priceMax);
 }
