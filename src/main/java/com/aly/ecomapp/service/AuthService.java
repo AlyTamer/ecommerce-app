@@ -12,6 +12,8 @@ import com.aly.ecomapp.repository.AppUserRepository;
 import com.aly.ecomapp.security.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,9 +21,11 @@ public class AuthService {
     private final AppUserRepository repo;
     private final PasswordService passwords;
     private final JwtUtil jwt;
+    private final JavaMailSender mailSender;
 
     @Autowired
-    public AuthService(AppUserRepository repo, PasswordService passwords, JwtUtil jwt) {
+    public AuthService(AppUserRepository repo, PasswordService passwords, JwtUtil jwt, JavaMailSender mailSender) {
+        this.mailSender = mailSender;
         this.repo = repo;
         this.passwords = passwords;
         this.jwt = jwt;
@@ -67,33 +71,40 @@ public class AuthService {
         );
     }
     private void generateOTP(AppUser u) {
-        String otp = Math.random()* 100000 + "";
-        otp = otp.substring(0, 6);
+        String otp="";
+        for(int i=0;i<6;i++){
+            int x =(int) (Math.random()*10);
+            otp+=x;
+        }
         u.setOtp(otp);
-        System.out.println(otp);
+        System.out.println("Otp is :"+otp);
         repo.save(u);
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("mailapiecomapp@gmail.com");
+        message.setTo(u.getEmail());
+        message.setSubject("Your OTP to Reset Password");
+        message.setText("Below is your otp to reset your password:\n"+otp);
+        mailSender.send(message);
+
+
+
     }
 
-    public AuthResponse resetPassword(@Valid ResetRequest req) {
-            AppUser user = repo.findByEmail(req.getEmail().toLowerCase())
-                    .orElseThrow(() -> new AuthException(AuthExceptionMessages.INVALID_CREDENTIALS));
+    public String  resetPassword(@Valid ResetRequest req) {
+        AppUser user = repo.findByEmail(req.getEmail().toLowerCase())
+                .orElseThrow(() -> new AuthException(AuthExceptionMessages.INVALID_CREDENTIALS));
 
-            if(user.getStatus()==UserStatus.BLOCKED){
-                throw new UserException(UserExceptionMessages.USER_IS_BLOCKED);
-            }
-        if (user.getOtp()==null) {
+        if (user.getStatus() == UserStatus.BLOCKED) {
+            throw new UserException(UserExceptionMessages.USER_IS_BLOCKED);
+        }
+        if (user.getOtp() == null) {
             generateOTP(user);
-        }
 
-        String otp = req.getOtp();
-        if (otp==user.getOtp()) {
-            user.setPasswordHash(passwords.hash(req.getNewPassword()));
-            user.setOtp(null); // Clear OTP after successful reset
-            repo.save(user);
-            String token = jwt.generateToken(user.getEmail(), "ROLE_" + user.getRole().name());
-            return new AuthResponse(token, user.getRole().name());
+            return "OTP sent to " + user.getEmail();
         }
-        throw new AuthException(AuthExceptionMessages.INVALID_CREDENTIALS);
+        else{
+            return "OTP Already Sent to " + user.getEmail();
+        }
 
     }
 
@@ -114,5 +125,18 @@ public class AuthService {
         }
 
 throw new AuthException(AuthExceptionMessages.INVALID_CREDENTIALS);
+    }
+
+    public AuthResponse confirmReset(@Valid ConfirmResetRequest req) {
+        AppUser user = repo.findByEmail(req.getEmail().toLowerCase())
+                .orElseThrow(() -> new AuthException(AuthExceptionMessages.INVALID_CREDENTIALS));
+        if( user.getOtp() == null || !user.getOtp().equals(req.getOtp())) {
+            throw new AuthException(AuthExceptionMessages.INVALID_OTP);
+        }
+        user.setPasswordHash(passwords.hash(req.getNewPassword()));
+        user.setOtp(null);
+        repo.save(user);
+        String token = jwt.generateToken(user.getEmail(), "ROLE_" + user.getRole().name());
+        return new AuthResponse(token, user.getRole().name());
     }
 }

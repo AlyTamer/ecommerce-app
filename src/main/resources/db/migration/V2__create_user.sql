@@ -6,7 +6,7 @@ CREATE TABLE users
     role          VARCHAR(255)                            NOT NULL,
     status        VARCHAR(255)                            NOT NULL,
     created_at    TIMESTAMP WITHOUT TIME ZONE             NOT NULL,
-    otp           VARCHAR(255)                                 NOT NULL,
+    otp           VARCHAR(255)                                 ,
     CONSTRAINT pk_users PRIMARY KEY (id)
 );
 

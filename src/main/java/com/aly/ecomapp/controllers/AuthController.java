@@ -18,12 +18,16 @@ public class AuthController {
         this.auth = auth;
     }
 
-    @PostMapping("/reset-password")
+    @PostMapping("/forgot-password")
     public ResponseEntity<?> ResetPassword(@Valid @RequestBody ResetRequest req) {
         return ResponseEntity.ok(auth.resetPassword(req));
     }
-    @PostMapping("/forgot-password")
-    public ResponseEntity<?> ForgotPassword(@Valid @RequestBody ForgotPasswordRequest req) {
+    @PostMapping("/confirm-reset")
+    public ResponseEntity<AuthResponse> confirmReset(@Valid @RequestBody ConfirmResetRequest req) {
+        return ResponseEntity.ok(auth.confirmReset(req));
+    }
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@Valid @RequestBody ForgotPasswordRequest req) {
         return ResponseEntity.ok(auth.changePassword(req));
     }
 
