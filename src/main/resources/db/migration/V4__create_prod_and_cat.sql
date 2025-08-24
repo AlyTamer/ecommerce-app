@@ -95,7 +95,6 @@ CREATE TABLE product_images
 ALTER TABLE product_images
     ADD CONSTRAINT fk_product_images_on_product FOREIGN KEY (product_id) REFERENCES products (id);
 
--- Example product images (split into single-row INSERTs for H2)
 INSERT INTO product_images (product_id, image)
 SELECT (SELECT id FROM products WHERE slug = 'sleek-white-orange-wireless-gaming-controller'), 'https://i.imgur.com/ZANVnHE.jpeg';
 
