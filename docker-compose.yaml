@@ -1,4 +1,4 @@
-# docker-compose.yml (LOCAL H2)
+# docker-compose.yml  (LOCAL H2)
 services:
   app:
     build:
@@ -8,6 +8,11 @@ services:
     ports:
       - "8080:8080"
     environment:
-      H2_CONSOLE_ENABLED: "true"   # optional; defaults to true in your props
+      # Force H2 explicitly (so even if a stray SPRING_DATASOURCE_URL exists, it won’t matter)
+      DB_DRIVER: org.h2.Driver
+      DB_URL: jdbc:h2:file:./.localdb/ecomdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=TRUE
+      DB_USERNAME: sa
+      DB_PASSWORD: ""
+      HIBERNATE_DIALECT: org.hibernate.dialect.H2Dialect
+      H2_CONSOLE_ENABLED: "true"
       SPRING_JPA_SHOW_SQL: "true"
-      # DO NOT set DB_* here → it will use H2 by default

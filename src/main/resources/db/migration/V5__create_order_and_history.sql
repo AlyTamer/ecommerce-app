@@ -5,7 +5,7 @@ CREATE TABLE order_history
     user_id     BIGINT                                  NOT NULL,
     status      VARCHAR(255)                            NOT NULL,
     total_price DECIMAL(19, 2),
-    changed_at  TIMESTAMP WITHOUT TIME ZONE,
+    changed_at  TIMESTAMP,
     CONSTRAINT pk_order_history PRIMARY KEY (id)
 );
 
@@ -15,8 +15,8 @@ CREATE TABLE orders
     user_id     BIGINT                                  NOT NULL,
     status      VARCHAR(255)                            NOT NULL,
     total_price DECIMAL(19, 2),
-    created_at  TIMESTAMP WITHOUT TIME ZONE,
-    updated_at  TIMESTAMP WITHOUT TIME ZONE,
+    created_at  TIMESTAMP,
+    updated_at  TIMESTAMP,
     CONSTRAINT pk_orders PRIMARY KEY (id)
 );
 
